@@ -58,6 +58,11 @@ void AGamePlayerController::HandleLook(const FInputActionValue& Value)
 	const FVector2D Axis = Value.Get<FVector2D>();
 	AddYawInput(Axis.X);
 	AddPitchInput(-Axis.Y);
+
+	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
+	{
+		C->SetLookInput(Axis);
+	}
 }
 
 void AGamePlayerController::HandleMove(const FInputActionValue& Value)

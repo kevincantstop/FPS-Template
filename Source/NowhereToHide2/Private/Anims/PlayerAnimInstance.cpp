@@ -5,6 +5,7 @@
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/PlayerCharacter.h"
 
 void UPlayerAnimInstance::NativeInitializeAnimation()
 {
@@ -28,5 +29,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (!bHasValidPawn) { return; }
 
 	Speed = static_cast<float>(MovementComponent->Velocity.Size2D());
+	
 	bIsMoving = Speed > 1.f;
+	
+	LookVector = Cast<APlayerCharacter>(OwnerCharacter)->GetLookInput();
 }

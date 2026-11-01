@@ -49,6 +49,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Movement")
 	void SetJumpEnabled(bool bEnabled);
 
+	void SetLookInput(const FVector2D& Axis) { LookInput = Axis; }
+	
+	FVector2D GetLookInput() const { return LookInput; }
+	
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArm;
@@ -58,6 +62,8 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly, Category = "NowhereToHide|Movement")
 	bool bIsSprinting = false;
+
+	FVector2D LookInput = FVector2D::ZeroVector;
 
 	void ApplyMovementSpeed();
 

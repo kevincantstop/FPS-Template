@@ -31,6 +31,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "NowhereToHide|Locomotion", meta = (AllowPrivateAccess = "true"))
 	bool bIsMoving = false;
 
+	UPROPERTY(BlueprintReadOnly, Category = "NowhereToHide|Look", meta = (AllowPrivateAccess = "true"))
+	FVector2D LookVector = FVector2D::ZeroVector;
+
 	UPROPERTY(Transient)
 	TObjectPtr<ACharacter> OwnerCharacter;
 

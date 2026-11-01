@@ -12,7 +12,7 @@ APlayerCharacter::APlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
-	SpringArm->SetupAttachment(GetMesh(), TEXT("CameraSocket"));
+	SpringArm->SetupAttachment(GetMesh());
 	SpringArm->bUsePawnControlRotation = false;
 	SpringArm->bEnableCameraLag = true;
 
@@ -41,6 +41,7 @@ bool APlayerCharacter::CanJumpInternal_Implementation() const
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
 	UpdateMovementSpeed(DeltaTime);
 }
 
