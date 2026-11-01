@@ -14,6 +14,7 @@ APlayerCharacter::APlayerCharacter()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	SpringArm->SetupAttachment(GetMesh(), TEXT("CameraSocket"));
 	SpringArm->bUsePawnControlRotation = false;
+	SpringArm->bEnableCameraLag = true;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(SpringArm);
@@ -21,6 +22,8 @@ APlayerCharacter::APlayerCharacter()
 
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationYaw = true;
+
+	GetMesh()->CastShadow = false;
 }
 
 void APlayerCharacter::BeginPlay()
