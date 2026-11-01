@@ -34,6 +34,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "NowhereToHide|Look", meta = (AllowPrivateAccess = "true"))
 	FVector2D LookVector = FVector2D::ZeroVector;
 
+	UPROPERTY(BlueprintReadOnly, Category = "NowhereToHide|Sway", meta = (AllowPrivateAccess = "true"))
+	FRotator SwayRot = FRotator::ZeroRotator;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Sway", meta = (ClampMin = "0.1"))
+	float SwayInterpSpeed = 5.f;
+
 	UPROPERTY(Transient)
 	TObjectPtr<ACharacter> OwnerCharacter;
 

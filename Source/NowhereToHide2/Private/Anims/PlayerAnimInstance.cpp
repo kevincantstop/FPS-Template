@@ -32,5 +32,11 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	
 	bIsMoving = Speed > 1.f;
 	
-	LookVector = Cast<APlayerCharacter>(OwnerCharacter)->GetLookInput();
+	if (APlayerCharacter* Player = Cast<APlayerCharacter>(OwnerCharacter))
+	{
+		LookVector = Player->GetLookInput();
+	}
+	
+	const FRotator SwayTarget(LookVector.Y, -LookVector.X,-LookVector.X);
+	SwayRot = FMath::RInterpTo(SwayRot, SwayTarget, DeltaSeconds, SwayInterpSpeed);
 }
