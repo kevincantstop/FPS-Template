@@ -1,0 +1,60 @@
+# ============================================================
+# NowhereToHide2 — 只提交「自己写的蓝图 + C++ 源码」
+# 第三方素材包（FPS_Assault_Pack / ShirtlessZombiesPack / Maps …）不入库
+# ============================================================
+
+# ---------- Unreal 生成物（永远不要提交）----------
+/Binaries/
+/Build/
+/DerivedDataCache/
+/Intermediate/
+/Saved/
+/Plugins/*/Binaries/
+/Plugins/*/Intermediate/
+/Plugins/*/DerivedDataCache/
+
+# ---------- IDE / UBT 生成的项目文件 ----------
+/.vs/
+/.idea/
+/.vscode/
+*.sln
+*.slnx
+*.suo
+*.user
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.xcodeproj/
+*.xcworkspace/
+*.code-workspace
+
+# ---------- Content：默认全部忽略，只放行自己的目录 ----------
+# 规则说明：先把 Content 下面的一切排除，再把 _Game 这个目录"取反"放行。
+# git 不会进入被排除的目录，所以必须先放行目录本身（末尾的 /），
+# 这样目录里的 .uasset 才会被跟踪。
+/Content/*
+!/Content/_Game/
+
+# 如果以后 _Game 里混进了别人的东西，在这里逐个排除，例如：
+# /Content/_Game/Vendor/
+
+# ---------- 工具 / 本地环境 ----------
+# .agents/sources 是一个嵌套的 git 仓库（clone 来的上游 skill 仓库），
+# 提交它会变成 gitlink，所以排除。.agents/README.md 和 skills/ 可以留着自己看。
+/.agents/sources/
+*.log
+*.bak
+CrashReportClient*
+
+# ---------- 系统垃圾 ----------
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ============================================================
+# 注意：下面这些是「可能想提交」的东西，我先按你说的不提交
+# ============================================================
+# 地图也是资产。不提交的话，全新 clone 下来没有 StartupMap，工程跑不起来。
+# 想让它能直接跑，把下面这行取消注释（它是「取反放行」，不是「排除」）：
+# !/Content/Maps/

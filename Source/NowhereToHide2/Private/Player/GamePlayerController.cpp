@@ -1,0 +1,111 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Player/GamePlayerController.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputActionValue.h"
+#include "Camera/PlayerCameraManager.h"
+#include "GameFramework/Character.h"
+#include "Player/PlayerCharacter.h"
+
+AGamePlayerController::AGamePlayerController()
+{
+	bShowMouseCursor = false;
+}
+
+void AGamePlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (PlayerCameraManager)
+	{
+		PlayerCameraManager->ViewPitchMin = -85.f;
+		PlayerCameraManager->ViewPitchMax =  85.f;
+	}
+
+	if (ULocalPlayer* LP = GetLocalPlayer())
+	{
+		if (auto* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			if (DefaultMappingContext)
+			{
+				Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			}
+		}
+	}
+}
+
+void AGamePlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		EIC->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGamePlayerController::HandleMove);
+		EIC->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGamePlayerController::HandleLook);
+		
+		EIC->BindAction(JumpAction, ETriggerEvent::Started,   this, &AGamePlayerController::HandleJumpStart);
+		EIC->BindAction(JumpAction, ETriggerEvent::Completed, this, &AGamePlayerController::HandleJumpStop);
+		
+		EIC->BindAction(SprintAction, ETriggerEvent::Started,   this, &AGamePlayerController::HandleSprintStart);
+		EIC->BindAction(SprintAction, ETriggerEvent::Completed, this, &AGamePlayerController::HandleSprintStop);
+	}
+}
+
+void AGamePlayerController::HandleLook(const FInputActionValue& Value)
+{
+	const FVector2D Axis = Value.Get<FVector2D>();
+	AddYawInput(Axis.X);
+	AddPitchInput(-Axis.Y);
+}
+
+void AGamePlayerController::HandleMove(const FInputActionValue& Value)
+{
+	APawn* P = GetPawn();
+	if (!P) { return; }
+
+	const FVector2D Axis = Value.Get<FVector2D>();
+	
+	const FRotator YawOnly(0.f, GetControlRotation().Yaw, 0.f);
+	const FVector Forward = FRotationMatrix(YawOnly).GetUnitAxis(EAxis::X);
+	const FVector Right   = FRotationMatrix(YawOnly).GetUnitAxis(EAxis::Y);
+
+	P->AddMovementInput(Forward, Axis.X);
+	P->AddMovementInput(Right,   Axis.Y);
+}
+
+void AGamePlayerController::HandleJumpStart()
+{
+	if (ACharacter* C = Cast<ACharacter>(GetPawn()))
+	{
+		if (C->CanJump())
+		{
+			C->Jump();
+		}
+	}
+}
+
+void AGamePlayerController::HandleJumpStop()
+{
+	if (ACharacter* C = Cast<ACharacter>(GetPawn()))
+	{
+		C->StopJumping();
+	}
+}
+
+void AGamePlayerController::HandleSprintStart()
+{
+	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
+	{
+		C->SetSprinting(true);
+	}
+}
+
+void AGamePlayerController::HandleSprintStop()
+{
+	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
+	{
+		C->SetSprinting(false);
+	}
+}
