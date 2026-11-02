@@ -66,7 +66,7 @@ void UCombatComponent::PlayFireMontage()
 		return;
 	}
 
-	if (Anim->Montage_Play(Montage, 1.f) <= 0.f)
+	if (Anim->Montage_Play(Montage, 1.2f) <= 0.f)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Fire montage failed to play: %s"), *GetNameSafe(Montage));
 	}
