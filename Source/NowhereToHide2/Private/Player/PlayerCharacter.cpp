@@ -4,6 +4,8 @@
 #include "Player/PlayerCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/RectLightComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -22,6 +24,9 @@ APlayerCharacter::APlayerCharacter()
 
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationYaw = true;
+
+	RectLight = CreateDefaultSubobject<URectLightComponent>(TEXT("RectLight"));
+	RectLight->SetupAttachment(GetCapsuleComponent());
 
 	GetMesh()->CastShadow = false;
 }

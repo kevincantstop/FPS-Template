@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class URectLightComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
@@ -59,6 +60,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="NowhereToHide|Camera", meta=(AllowPrivateAccess=true))
 	TObjectPtr<UCameraComponent> Camera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Light", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<URectLightComponent> RectLight;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "NowhereToHide|Movement")
 	bool bIsSprinting = false;
