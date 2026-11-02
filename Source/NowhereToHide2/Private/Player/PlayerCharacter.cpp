@@ -81,11 +81,23 @@ void APlayerCharacter::SetAiming(bool bNewAiming)
 {
 	if (bIsAiming == bNewAiming) { return; }
 	bIsAiming = bNewAiming;
+
+	if (bIsAiming)
+	{
+		SetSprinting(false);
+	}
 }
 
 void APlayerCharacter::StartFire()
 {
-	if (CombatComponent) { CombatComponent->StartFire(); }
+	if (bIsSprinting)
+	{
+		SetSprinting(false);
+	}
+	if (CombatComponent)
+	{
+		CombatComponent->StartFire();
+	}
 }
 
 void APlayerCharacter::StopFire()
