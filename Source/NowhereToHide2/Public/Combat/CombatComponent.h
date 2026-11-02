@@ -24,6 +24,9 @@ protected:
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void StartFire();
+	void StopFire();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Camera", meta = (ClampMin = "20.0", ClampMax = "170.0"))
 	float DefaultFOV = 90.f;
@@ -34,6 +37,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Camera", meta = (ClampMin = "0.1"))
 	float FOVInterpSpeed = 12.f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TObjectPtr<UAnimMontage> FireMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TObjectPtr<UAnimMontage> AimFireMontage;
+
 private:
 	UPROPERTY(Transient)
 	TObjectPtr<APlayerCharacter> OwnerCharacter;
@@ -41,5 +50,10 @@ private:
 	UPROPERTY(Transient)
 	TObjectPtr<UCameraComponent> Camera;
 
-	void UpdateCameraFOV(float DeltaTime);	
+	void UpdateCameraFOV(float DeltaTime);
+
+	void PlayFireMontage();
+	UAnimMontage* SelectFireMontage() const;
+
+	bool bIsFiring = false;
 };

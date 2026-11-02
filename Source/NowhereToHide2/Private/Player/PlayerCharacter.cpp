@@ -83,6 +83,16 @@ void APlayerCharacter::SetAiming(bool bNewAiming)
 	bIsAiming = bNewAiming;
 }
 
+void APlayerCharacter::StartFire()
+{
+	if (CombatComponent) { CombatComponent->StartFire(); }
+}
+
+void APlayerCharacter::StopFire()
+{
+	if (CombatComponent) { CombatComponent->StopFire(); }
+}
+
 void APlayerCharacter::ApplyMovementSpeed()
 {
 	if (UCharacterMovementComponent* Move = GetCharacterMovement())

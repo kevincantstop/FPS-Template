@@ -63,6 +63,12 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Aim")
 	bool IsAiming() const { return bIsAiming; }
+
+	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
+	void StartFire();
+
+	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
+	void StopFire();
 	
 private:
 	UPROPERTY(VisibleAnywhere)

@@ -43,6 +43,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
 	TObjectPtr<UInputAction> AimAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
+	TObjectPtr<UInputAction> FireAction;
+
 private:
 	void HandleLook(const FInputActionValue& Value);
 	void HandleMove(const FInputActionValue& Value);
@@ -55,4 +58,7 @@ private:
 
 	void HandleAimStart();
 	void HandleAimStop();
+
+	void HandleFireStart();
+	void HandleFireStop();
 };

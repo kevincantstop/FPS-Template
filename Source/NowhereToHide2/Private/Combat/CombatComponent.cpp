@@ -2,6 +2,9 @@
 
 #include "Camera/CameraComponent.h"
 #include "Player/PlayerCharacter.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
+#include "GameFramework/Character.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -34,5 +37,47 @@ void UCombatComponent::UpdateCameraFOV(float DeltaTime)
 
 	const float TargetFOV = OwnerCharacter->IsAiming() ? AimFOV : DefaultFOV;
 	Camera->SetFieldOfView(FMath::FInterpTo(Camera->FieldOfView, TargetFOV, DeltaTime, FOVInterpSpeed));
+}
+
+void UCombatComponent::StartFire()
+{
+	bIsFiring = true;
+	PlayFireMontage();
+}
+
+void UCombatComponent::StopFire()
+{
+	bIsFiring = false;
+}
+
+void UCombatComponent::PlayFireMontage()
+{
+	if (!OwnerCharacter) { return; }
+
+	UAnimMontage* Montage = SelectFireMontage();
+	if (!Montage) { return; }
+
+	USkeletalMeshComponent* SkelMesh = OwnerCharacter->GetMesh();
+	UAnimInstance* Anim = SkelMesh ? SkelMesh->GetAnimInstance() : nullptr;
+	if (!Anim) { return; }
+	
+	if (Anim->Montage_IsPlaying(FireMontage) || Anim->Montage_IsPlaying(AimFireMontage))
+	{
+		return;
+	}
+
+	if (Anim->Montage_Play(Montage, 1.f) <= 0.f)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Fire montage failed to play: %s"), *GetNameSafe(Montage));
+	}
+}
+
+UAnimMontage* UCombatComponent::SelectFireMontage() const
+{
+	if (OwnerCharacter && OwnerCharacter->IsAiming() && AimFireMontage)
+	{
+		return AimFireMontage;
+	}
+	return FireMontage;
 }
 

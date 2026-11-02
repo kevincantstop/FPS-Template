@@ -53,6 +53,9 @@ void AGamePlayerController::SetupInputComponent()
 
 		EIC->BindAction(AimAction, ETriggerEvent::Started,   this, &AGamePlayerController::HandleAimStart);
 		EIC->BindAction(AimAction, ETriggerEvent::Completed, this, &AGamePlayerController::HandleAimStop);
+
+		EIC->BindAction(FireAction, ETriggerEvent::Started,   this, &AGamePlayerController::HandleFireStart);
+		EIC->BindAction(FireAction, ETriggerEvent::Completed, this, &AGamePlayerController::HandleFireStop);
 	}
 }
 
@@ -131,5 +134,21 @@ void AGamePlayerController::HandleAimStop()
 	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
 	{
 		C->SetAiming(false);
+	}
+}
+
+void AGamePlayerController::HandleFireStart()
+{
+	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
+	{
+		C->StartFire();
+	}
+}
+
+void AGamePlayerController::HandleFireStop()
+{
+	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
+	{
+		C->StopFire();
 	}
 }
