@@ -53,6 +53,12 @@ public:
 	void SetLookInput(const FVector2D& Axis) { LookInput = Axis; }
 	
 	FVector2D GetLookInput() const { return LookInput; }
+
+	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Aim")
+	void SetAiming(bool bNewAiming);
+
+	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Aim")
+	bool IsAiming() const { return bIsAiming; }
 	
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -63,6 +69,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Light", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URectLightComponent> RectLight;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "NowhereToHide|Aim")
+	bool bIsAiming = false;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "NowhereToHide|Movement")
 	bool bIsSprinting = false;

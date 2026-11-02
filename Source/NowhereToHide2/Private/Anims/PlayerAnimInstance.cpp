@@ -35,6 +35,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (APlayerCharacter* Player = Cast<APlayerCharacter>(OwnerCharacter))
 	{
 		LookVector = Player->GetLookInput();
+		bIsAiming  = Player->IsAiming();
 	}
 	
 	const FRotator SwayTarget(LookVector.Y, -LookVector.X,-LookVector.X);

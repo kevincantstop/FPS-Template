@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
 	TObjectPtr<UInputAction> SprintAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
+	TObjectPtr<UInputAction> AimAction;
+
 private:
 	void HandleLook(const FInputActionValue& Value);
 	void HandleMove(const FInputActionValue& Value);
@@ -49,4 +52,7 @@ private:
 
 	void HandleSprintStart();
 	void HandleSprintStop();
+
+	void HandleAimStart();
+	void HandleAimStop();
 };

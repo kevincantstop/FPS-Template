@@ -74,6 +74,12 @@ void APlayerCharacter::SetJumpEnabled(bool bEnabled)
 	}
 }
 
+void APlayerCharacter::SetAiming(bool bNewAiming)
+{
+	if (bIsAiming == bNewAiming) { return; }
+	bIsAiming = bNewAiming;
+}
+
 void APlayerCharacter::ApplyMovementSpeed()
 {
 	if (UCharacterMovementComponent* Move = GetCharacterMovement())
