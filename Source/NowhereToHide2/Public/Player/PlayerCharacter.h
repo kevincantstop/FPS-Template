@@ -9,6 +9,7 @@
 class URectLightComponent;
 class UCameraComponent;
 class USpringArmComponent;
+class UCombatComponent;
 
 UCLASS()
 class NOWHERETOHIDE2_API APlayerCharacter : public ACharacter
@@ -18,10 +19,13 @@ class NOWHERETOHIDE2_API APlayerCharacter : public ACharacter
 public:
 	APlayerCharacter();
 
-protected:
-	virtual void BeginPlay() override;
+	UCameraComponent* GetCamera() const { return Camera; }
+	
+	UCombatComponent* GetCombatComponent() const { return CombatComponent; }
 
 protected:
+	virtual void BeginPlay() override;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Movement")
 	float WalkSpeed = 150.f;
 
@@ -69,6 +73,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Light", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URectLightComponent> RectLight;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Combat", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCombatComponent> CombatComponent;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "NowhereToHide|Aim")
 	bool bIsAiming = false;

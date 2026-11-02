@@ -4,6 +4,7 @@
 #include "Player/PlayerCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Combat/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/RectLightComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -27,6 +28,8 @@ APlayerCharacter::APlayerCharacter()
 
 	RectLight = CreateDefaultSubobject<URectLightComponent>(TEXT("RectLight"));
 	RectLight->SetupAttachment(GetCapsuleComponent());
+
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 
 	GetMesh()->CastShadow = false;
 }
