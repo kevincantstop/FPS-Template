@@ -53,9 +53,11 @@ void UCombatComponent::EquipWeapon(AWeapon* NewWeapon)
 	
 	if (CurrentWeapon && CurrentWeapon != NewWeapon)
 	{
+		StopFire();
 		CurrentWeapon->Destroy();
 	}
 
+	NewWeapon->SetOwner(OwnerCharacter);
 	NewWeapon->AttachToMesh(ArmsMesh, WeaponSocketName);
 	CurrentWeapon = NewWeapon;
 }
@@ -82,13 +84,28 @@ void UCombatComponent::UpdateCameraFOV(float DeltaTime)
 
 void UCombatComponent::StartFire()
 {
+	if (bIsFiring) { return; }
+	if (!CurrentWeapon) { return; }
+
 	bIsFiring = true;
-	PlayFireMontage();
+	CurrentWeapon->StartFire();
 }
 
 void UCombatComponent::StopFire()
 {
+	if (!bIsFiring) { return; }
+
 	bIsFiring = false;
+
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->StopFire();
+	}
+}
+
+void UCombatComponent::OnWeaponShot()
+{
+	PlayFireMontage();
 }
 
 void UCombatComponent::PlayFireMontage()
@@ -102,15 +119,11 @@ void UCombatComponent::PlayFireMontage()
 	UAnimInstance* Anim = SkelMesh ? SkelMesh->GetAnimInstance() : nullptr;
 	if (!Anim) { return; }
 	
-	if (Anim->Montage_IsPlaying(FireMontage) || Anim->Montage_IsPlaying(AimFireMontage))
-	{
-		return;
-	}
+	const float Length   = Montage->GetPlayLength();
+	const float Interval = FMath::Max(CurrentWeapon ? CurrentWeapon->GetFireInterval() : 0.12f, 0.01f);
+	const float Rate     = (Length > Interval) ? (Length / Interval) : 1.f;
 
-	if (Anim->Montage_Play(Montage, 1.2f) <= 0.f)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Fire montage failed to play: %s"), *GetNameSafe(Montage));
-	}
+	Anim->Montage_Play(Montage, Rate);
 }
 
 UAnimMontage* UCombatComponent::SelectFireMontage() const
@@ -126,6 +139,7 @@ void UCombatComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (CurrentWeapon)
 	{
+		StopFire();
 		CurrentWeapon->Destroy();
 		CurrentWeapon = nullptr;
 	}

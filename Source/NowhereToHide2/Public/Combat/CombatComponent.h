@@ -37,6 +37,7 @@ public:
 
 	void StartFire();
 	void StopFire();
+	void OnWeaponShot();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Camera", meta = (ClampMin = "20.0", ClampMax = "170.0"))
