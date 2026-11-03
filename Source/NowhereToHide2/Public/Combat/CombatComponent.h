@@ -7,6 +7,7 @@
 #include "CombatComponent.generated.h"
 
 
+class AWeapon;
 class UCameraComponent;
 class APlayerCharacter;
 
@@ -18,8 +19,18 @@ class NOWHERETOHIDE2_API UCombatComponent : public UActorComponent
 public:
 	UCombatComponent();
 
+	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
+	void EquipWeapon(AWeapon* NewWeapon);
+
+	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Combat")
+	AWeapon* GetCurrentWeapon() const;
+
 protected:
 	virtual void BeginPlay() override;
+
+	void SpawnDefaultWeapon();
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -42,6 +53,15 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
 	TObjectPtr<UAnimMontage> AimFireMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TSubclassOf<AWeapon> DefaultWeaponClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	FName WeaponSocketName = TEXT("R_GunSocket");
+
+	UPROPERTY(Transient)
+	TObjectPtr<AWeapon> CurrentWeapon;
 
 private:
 	UPROPERTY(Transient)

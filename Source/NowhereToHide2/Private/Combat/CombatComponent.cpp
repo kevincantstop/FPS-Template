@@ -5,6 +5,7 @@
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "GameFramework/Character.h"
+#include "Weapon/Weapon.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -22,6 +23,46 @@ void UCombatComponent::BeginPlay()
 	{
 		Camera->SetFieldOfView(DefaultFOV);
 	}
+
+	SpawnDefaultWeapon();
+}
+
+void UCombatComponent::SpawnDefaultWeapon()
+{
+	if (!DefaultWeaponClass || !OwnerCharacter) { return; }
+
+	FActorSpawnParameters Params;
+	Params.Owner = OwnerCharacter;
+	Params.Instigator = OwnerCharacter;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AWeapon* Weapon = GetWorld()->SpawnActor<AWeapon>(
+		DefaultWeaponClass, OwnerCharacter->GetActorTransform(), Params);
+
+	if (!Weapon) { return; }
+
+	EquipWeapon(Weapon);
+}
+
+void UCombatComponent::EquipWeapon(AWeapon* NewWeapon)
+{
+	if (!NewWeapon || !OwnerCharacter) { return; }
+
+	USkeletalMeshComponent* ArmsMesh = OwnerCharacter->GetMesh();
+	if (!ArmsMesh) { return; }
+	
+	if (CurrentWeapon && CurrentWeapon != NewWeapon)
+	{
+		CurrentWeapon->Destroy();
+	}
+
+	NewWeapon->AttachToMesh(ArmsMesh, WeaponSocketName);
+	CurrentWeapon = NewWeapon;
+}
+
+AWeapon* UCombatComponent::GetCurrentWeapon() const
+{
+	return CurrentWeapon;
 }
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -79,5 +120,16 @@ UAnimMontage* UCombatComponent::SelectFireMontage() const
 		return AimFireMontage;
 	}
 	return FireMontage;
+}
+
+void UCombatComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->Destroy();
+		CurrentWeapon = nullptr;
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 

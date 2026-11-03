@@ -2,7 +2,15 @@
 
 AWeapon::AWeapon()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+
+	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+	SetRootComponent(WeaponMesh);
+	
+	WeaponMesh->SetCollisionProfileName(TEXT("NoCollision"));
+	WeaponMesh->SetGenerateOverlapEvents(false);
+	
+	WeaponMesh->SetCastShadow(false);
 }
 
 void AWeapon::BeginPlay()
@@ -10,7 +18,11 @@ void AWeapon::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AWeapon::Tick(float DeltaTime)
+void AWeapon::AttachToMesh(USkeletalMeshComponent* ParentMesh, FName SocketName)
 {
-	Super::Tick(DeltaTime);
+	if (!ParentMesh) { return; }
+
+	AttachToComponent(ParentMesh,
+		FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+		SocketName);
 }
