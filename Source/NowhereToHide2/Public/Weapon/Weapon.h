@@ -32,8 +32,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon", meta = (ClampMin = "0.01"))
 	float FireInterval = 0.12f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
+	TObjectPtr<UAnimMontage> WeaponFireMontage;
+
 private:
 	void FireOnce();
+	void PlayWeaponFireMontage();
 
 	FTimerHandle FireTimerHandle;
 	bool bFiring = false;

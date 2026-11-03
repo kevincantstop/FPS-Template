@@ -30,6 +30,8 @@ void AWeapon::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AWeapon::FireOnce()
 {
 	if (!bFiring) { return; }
+
+	PlayWeaponFireMontage();
 	
 	if (APlayerCharacter* Char = Cast<APlayerCharacter>(GetOwner()))
 	{
@@ -40,6 +42,26 @@ void AWeapon::FireOnce()
 	}
 	
 	UE_LOG(LogTemp, Warning, TEXT("[Weapon] Bang"));
+}
+
+void AWeapon::PlayWeaponFireMontage()
+{
+	if (!WeaponFireMontage || !WeaponMesh) { return; }
+
+	UAnimInstance* Anim = WeaponMesh->GetAnimInstance();
+	if (!Anim)
+	{
+		UE_LOG(LogTemp, Warning,
+				TEXT("[Weapon] %s has no AnimInstance, montage cannot play. Assign an Anim Class to WeaponMesh in BP_Weapon."),
+				*GetNameSafe(this));
+		return;
+	}
+
+	const float Length   = WeaponFireMontage->GetPlayLength();
+	const float Interval = FMath::Max(FireInterval, 0.01f);
+	const float Rate     = (Length > Interval) ? (Length / Interval) : 1.f;
+
+	Anim->Montage_Play(WeaponFireMontage, Rate);
 }
 
 void AWeapon::AttachToMesh(USkeletalMeshComponent* ParentMesh, FName SocketName)
