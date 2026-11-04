@@ -69,6 +69,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
 	void StopFire();
+
+	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
+	void Reload();
 	
 private:
 	UPROPERTY(VisibleAnywhere)

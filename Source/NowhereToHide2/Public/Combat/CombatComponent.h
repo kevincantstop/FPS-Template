@@ -38,6 +38,10 @@ public:
 	void StartFire();
 	void StopFire();
 	void OnWeaponShot();
+	void OnWeaponReload();
+
+	void Reload();
+	float GetReloadMontageDuration() const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Camera", meta = (ClampMin = "20.0", ClampMax = "170.0"))
@@ -54,6 +58,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
 	TObjectPtr<UAnimMontage> AimFireMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TObjectPtr<UAnimMontage> ReloadMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TObjectPtr<UAnimMontage> ReloadEmptyMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
 	TSubclassOf<AWeapon> DefaultWeaponClass;
@@ -75,6 +85,9 @@ private:
 
 	void PlayFireMontage();
 	UAnimMontage* SelectFireMontage() const;
+
+	void PlayReloadMontage();
+	UAnimMontage* SelectReloadMontage() const;
 
 	bool bIsFiring = false;
 };

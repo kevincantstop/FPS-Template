@@ -46,6 +46,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
 	TObjectPtr<UInputAction> FireAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
+	TObjectPtr<UInputAction> ReloadAction;
+
 private:
 	void HandleLook(const FInputActionValue& Value);
 	void HandleMove(const FInputActionValue& Value);
@@ -61,4 +64,6 @@ private:
 
 	void HandleFireStart();
 	void HandleFireStop();
+
+	void HandleReload();
 };

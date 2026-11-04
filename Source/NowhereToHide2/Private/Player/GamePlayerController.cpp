@@ -56,6 +56,8 @@ void AGamePlayerController::SetupInputComponent()
 
 		EIC->BindAction(FireAction, ETriggerEvent::Started,   this, &AGamePlayerController::HandleFireStart);
 		EIC->BindAction(FireAction, ETriggerEvent::Completed, this, &AGamePlayerController::HandleFireStop);
+
+		EIC->BindAction(ReloadAction, ETriggerEvent::Started, this, &AGamePlayerController::HandleReload);
 	}
 }
 
@@ -150,5 +152,13 @@ void AGamePlayerController::HandleFireStop()
 	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
 	{
 		C->StopFire();
+	}
+}
+
+void AGamePlayerController::HandleReload()
+{
+	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
+	{
+		C->Reload();
 	}
 }

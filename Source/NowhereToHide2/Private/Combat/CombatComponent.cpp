@@ -108,6 +108,25 @@ void UCombatComponent::OnWeaponShot()
 	PlayFireMontage();
 }
 
+void UCombatComponent::OnWeaponReload()
+{
+	PlayReloadMontage();
+}
+
+void UCombatComponent::Reload()
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->StartReload();
+	}
+}
+
+float UCombatComponent::GetReloadMontageDuration() const
+{
+	const UAnimMontage* Montage = SelectReloadMontage();
+	return Montage ? Montage->GetPlayLength() : 0.f;
+}
+
 void UCombatComponent::PlayFireMontage()
 {
 	if (!OwnerCharacter) { return; }
@@ -133,6 +152,29 @@ UAnimMontage* UCombatComponent::SelectFireMontage() const
 		return AimFireMontage;
 	}
 	return FireMontage;
+}
+
+void UCombatComponent::PlayReloadMontage()
+{
+	UAnimMontage* Montage = SelectReloadMontage();
+	if (!Montage || !OwnerCharacter) { return; }
+
+	USkeletalMeshComponent* ArmsMesh = OwnerCharacter->GetMesh();
+	UAnimInstance* Anim = ArmsMesh ? ArmsMesh->GetAnimInstance() : nullptr;
+	if (!Anim) { return; }
+
+	Anim->Montage_Play(Montage, 1.f);
+}
+
+UAnimMontage* UCombatComponent::SelectReloadMontage() const
+{
+	const bool bClipEmpty = CurrentWeapon && CurrentWeapon->GetAmmoInClip() <= 0;
+
+	if (bClipEmpty && ReloadEmptyMontage)
+	{
+		return ReloadEmptyMontage;
+	}
+	return ReloadMontage;
 }
 
 void UCombatComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -105,6 +105,14 @@ void APlayerCharacter::StopFire()
 	if (CombatComponent) { CombatComponent->StopFire(); }
 }
 
+void APlayerCharacter::Reload()
+{
+	if (CombatComponent)
+	{
+		CombatComponent->Reload();
+	}
+}
+
 void APlayerCharacter::ApplyMovementSpeed()
 {
 	if (UCharacterMovementComponent* Move = GetCharacterMovement())
