@@ -1,7 +1,9 @@
 ﻿#include "Weapon/Weapon.h"
 
+#include "Camera/CameraComponent.h"
 #include "Combat/CombatComponent.h"
 #include "Player/PlayerCharacter.h"
+#include "Weapon/Bullet.h"
 
 AWeapon::AWeapon()
 {
@@ -27,9 +29,35 @@ void AWeapon::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+void AWeapon::FireBullet()
+{
+	if (!BulletClass || !WeaponMesh) { return; }
+
+	const FVector MuzzleLocation = WeaponMesh->GetSocketLocation(MuzzleSocketName);
+	
+	FRotator SpawnRotation = WeaponMesh->GetSocketRotation(MuzzleSocketName);
+
+	if (const APlayerCharacter* Character = Cast<APlayerCharacter>(GetOwner()))
+	{
+		if (const UCameraComponent* Camera = Character->GetCamera())
+		{
+			SpawnRotation = Camera->GetComponentRotation();
+		}
+	}
+
+	FActorSpawnParameters Params;
+	Params.Owner = GetOwner();
+	Params.Instigator = Cast<APawn>(GetOwner());
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	GetWorld()->SpawnActor<ABullet>(BulletClass, MuzzleLocation, SpawnRotation, Params);
+}
+
 void AWeapon::FireOnce()
 {
 	if (!bFiring) { return; }
+
+	FireBullet();
 
 	PlayWeaponFireMontage();
 	

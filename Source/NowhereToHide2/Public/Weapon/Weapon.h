@@ -4,6 +4,8 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+class ABullet;
+
 UCLASS()
 class NOWHERETOHIDE2_API AWeapon : public AActor
 {
@@ -35,7 +37,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
 	TObjectPtr<UAnimMontage> WeaponFireMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
+	TSubclassOf<ABullet> BulletClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
+	FName MuzzleSocketName = TEXT("Muzzle");
+	
 private:
+	void FireBullet();
 	void FireOnce();
 	void PlayWeaponFireMontage();
 
