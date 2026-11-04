@@ -65,6 +65,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
 	TObjectPtr<USoundBase> DryFireSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon", meta = (ClampMin = "0.0", UIMax = "10.0"))
+	float HipSpreadDegrees = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon", meta = (ClampMin = "0.0", UIMax = "10.0"))
+	float AimSpreadDegrees = 0.15f;
 	
 	UPROPERTY(VisibleInstanceOnly, Category = "NowhereToHide|Weapon")
 	int32 AmmoInClip = 0;
@@ -77,6 +83,7 @@ private:
 	void FireOnce();
 	void PlayWeaponFireMontage();
 	void PlayDryFireSound();
+	float GetCurrentSpreadDegrees() const;
 
 	void PlayReloadMontage();
 	UAnimMontage* SelectReloadMontage() const;

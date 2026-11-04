@@ -74,6 +74,16 @@ void AWeapon::FireBullet()
 		}
 	}
 
+	const float SpreadDegrees = GetCurrentSpreadDegrees();
+	if (SpreadDegrees > 0.f)
+	{
+		const FVector BaseDirection = SpawnRotation.Vector();
+		const FVector ScatteredDirection =
+			FMath::VRandCone(BaseDirection, FMath::DegreesToRadians(SpreadDegrees));
+
+		SpawnRotation = ScatteredDirection.Rotation();
+	}
+
 	FActorSpawnParameters Params;
 	Params.Owner = GetOwner();
 	Params.Instigator = Cast<APawn>(GetOwner());
@@ -141,6 +151,16 @@ void AWeapon::PlayDryFireSound()
 		false,
 		1.f,
 		FMath::FRandRange(0.95f, 1.05f));
+}
+
+float AWeapon::GetCurrentSpreadDegrees() const
+{
+	const APlayerCharacter* Char = Cast<APlayerCharacter>(GetOwner());
+	if (Char && Char->IsAiming())
+	{
+		return AimSpreadDegrees;
+	}
+	return HipSpreadDegrees;
 }
 
 void AWeapon::PlayReloadMontage()
