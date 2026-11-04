@@ -68,8 +68,6 @@ void AWeapon::FireOnce()
 			Combat->OnWeaponShot();
 		}
 	}
-	
-	UE_LOG(LogTemp, Warning, TEXT("[Weapon] Bang"));
 }
 
 void AWeapon::PlayWeaponFireMontage()

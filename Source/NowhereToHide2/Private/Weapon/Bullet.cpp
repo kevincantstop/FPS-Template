@@ -1,5 +1,6 @@
 ﻿#include "Weapon/Bullet.h"
 
+#include "Components/DecalComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -52,26 +53,29 @@ void ABullet::Tick(float DeltaTime)
 void ABullet::SpawnImpactDecal(const FHitResult& Impact)
 {
 	if (!DecalMaterial) { return; }
-	
+
 	const FRotator DecalRotation = (-Impact.ImpactNormal).Rotation();
-	const FVector DecalSize = FVector(7.f, 7.f, 7.f);
-	constexpr float DecalLifeSpan = 10.f;
+	
+	UDecalComponent* Decal;
 
 	if (USceneComponent* HitComponent = Impact.GetComponent())
 	{
-		UGameplayStatics::SpawnDecalAttached(
-			DecalMaterial,
-			DecalSize,
-			HitComponent,
-			Impact.BoneName,
-			Impact.Location,
-			DecalRotation,
-			EAttachLocation::KeepWorldPosition,
-			DecalLifeSpan);
-		return;
+		Decal = UGameplayStatics::SpawnDecalAttached(
+			DecalMaterial, DecalSize, HitComponent, Impact.BoneName,
+			Impact.ImpactPoint, DecalRotation,
+			EAttachLocation::KeepWorldPosition, DecalLifeSpan);
 	}
-	
-	UGameplayStatics::SpawnDecalAtLocation(this, DecalMaterial, DecalSize, Impact.Location, DecalRotation, DecalLifeSpan);
+	else
+	{
+		Decal = UGameplayStatics::SpawnDecalAtLocation(
+			this, DecalMaterial, DecalSize, Impact.ImpactPoint,
+			DecalRotation, DecalLifeSpan);
+	}
+
+	if (Decal)
+	{
+		Decal->SetFadeScreenSize(0.f);
+	}
 }
 
 void ABullet::PlayImpactSound(const FHitResult& Impact)

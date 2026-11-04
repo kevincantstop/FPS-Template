@@ -29,6 +29,12 @@ protected:
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
+	FVector DecalSize = FVector(30.f, 60.f, 60.f);
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon", meta = (ClampMin = "0.0"))
+	float DecalLifeSpan = 10.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
 	TObjectPtr<UMaterialInterface> DecalMaterial;
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
