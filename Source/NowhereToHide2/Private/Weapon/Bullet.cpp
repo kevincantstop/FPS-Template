@@ -112,9 +112,7 @@ void ABullet::ApplyImpactImpulse(const FHitResult& Impact)
 	if (!HitComponent->IsSimulatingPhysics(Impact.BoneName)) { return; }
 	
 	const FVector Direction = -Impact.ImpactNormal;
-	
-	const float Mass = HitComponent->GetMass();
-	const FVector Impulse = Direction * ProjectileMovement->InitialSpeed * FMath::Max(Mass, 0.1f);
+	const FVector Impulse = Direction * ProjectileMovement->InitialSpeed * ImpactImpulse;
 
 	HitComponent->AddImpulseAtLocation(Impulse, Impact.Location, Impact.BoneName);
 }
