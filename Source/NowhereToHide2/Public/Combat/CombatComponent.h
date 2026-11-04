@@ -70,6 +70,15 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
 	FName WeaponSocketName = TEXT("R_GunSocket");
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Recoil", meta = (ClampMin = "0.0"))
+	float RecoilPitchPerShot = 0.5f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Recoil", meta = (ClampMin = "0.0"))
+	float RecoilYawPerShot = 0.15f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Recoil", meta = (ClampMin = "0.0"))
+	float AimRecoilMultiplier = 0.6f;
 
 	UPROPERTY(Transient)
 	TObjectPtr<AWeapon> CurrentWeapon;
@@ -82,6 +91,8 @@ private:
 	TObjectPtr<UCameraComponent> Camera;
 
 	void UpdateCameraFOV(float DeltaTime);
+
+	void ApplyRecoil();
 
 	void PlayFireMontage();
 	UAnimMontage* SelectFireMontage() const;

@@ -82,13 +82,30 @@ void UCombatComponent::UpdateCameraFOV(float DeltaTime)
 	Camera->SetFieldOfView(FMath::FInterpTo(Camera->FieldOfView, TargetFOV, DeltaTime, FOVInterpSpeed));
 }
 
+void UCombatComponent::ApplyRecoil()
+{
+	if (!OwnerCharacter) { return; }
+
+	APlayerController* PC = Cast<APlayerController>(OwnerCharacter->GetController());
+	if (!PC) { return; }
+
+	const float Multiplier = OwnerCharacter->IsAiming() ? AimRecoilMultiplier : 1.f;
+
+	FRotator NewRotation = PC->GetControlRotation();
+	NewRotation.Pitch += RecoilPitchPerShot * Multiplier;
+	NewRotation.Yaw   += FMath::FRandRange(-RecoilYawPerShot, RecoilYawPerShot) * Multiplier;
+	NewRotation.Roll   = 0.f;
+
+	PC->SetControlRotation(NewRotation);
+}
+
 void UCombatComponent::StartFire()
 {
 	if (bIsFiring) { return; }
 	if (!CurrentWeapon) { return; }
 
-	bIsFiring = true;
 	CurrentWeapon->StartFire();
+	bIsFiring = CurrentWeapon->IsFiring();
 }
 
 void UCombatComponent::StopFire()
@@ -106,6 +123,7 @@ void UCombatComponent::StopFire()
 void UCombatComponent::OnWeaponShot()
 {
 	PlayFireMontage();
+	ApplyRecoil();
 }
 
 void UCombatComponent::OnWeaponReload()
