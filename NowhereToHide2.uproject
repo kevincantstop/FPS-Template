@@ -34,19 +34,11 @@
 			"Enabled": true
 		},
 		{
-			"Name": "AllToolsets",
-			"Enabled": true
-		},
-		{
 			"Name": "AnimationAssistantToolset",
 			"Enabled": true
 		},
 		{
 			"Name": "EditorToolset",
-			"Enabled": true
-		},
-		{
-			"Name": "GameFeaturesToolset",
 			"Enabled": true
 		},
 		{
