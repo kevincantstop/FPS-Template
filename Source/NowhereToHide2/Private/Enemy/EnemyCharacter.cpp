@@ -21,6 +21,8 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	ApplyRandomMesh();
+	
 	bCanSprint = FMath::FRand() < SprintChance;
 	
 	EffectiveRunSpeed = RunSpeed + FMath::FRandRange(-SpeedVariation, SpeedVariation);
@@ -49,4 +51,17 @@ void AEnemyCharacter::ApplyMovementSpeed()
 	{
 		Move->MaxWalkSpeed = bIsSprinting ? SprintSpeed : EffectiveRunSpeed;
 	}
+}
+
+void AEnemyCharacter::ApplyRandomMesh()
+{
+	if (MeshPool.Num() == 0) { return; }
+
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	if (!MeshComp) { return; }
+
+	USkeletalMesh* Picked = MeshPool[FMath::RandRange(0, MeshPool.Num() - 1)];
+	if (!Picked) { return; }
+
+	MeshComp->SetSkeletalMeshAsset(Picked);
 }

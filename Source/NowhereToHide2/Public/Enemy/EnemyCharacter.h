@@ -42,8 +42,12 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, Category = "NowhereToHide|Movement")
 	bool bCanSprint = false;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Visual")
+	TArray<TObjectPtr<USkeletalMesh>> MeshPool;
+
 private:
 	void ApplyMovementSpeed();
+	void ApplyRandomMesh();
 	
 	float EffectiveRunSpeed = 200.f;
 };
