@@ -1,8 +1,7 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿#include "Anims/EnemyAnimInstance.h"
 
-
-#include "Anims/EnemyAnimInstance.h"
-
+#include "Animation/AnimSequence.h"
+#include "Enemy/EnemyCharacter.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -13,8 +12,11 @@ void UEnemyAnimInstance::NativeInitializeAnimation()
 	OwnerCharacter = Cast<ACharacter>(TryGetPawnOwner());
 	MovementComponent = OwnerCharacter ? OwnerCharacter->GetCharacterMovement() : nullptr;
 	bHasValidPawn = MovementComponent != nullptr;
-
-	PickRandomAnimations();
+	
+	IdleSequence = PickRandomFrom(IdleSequencePool);
+	StartPosition = IdleSequence
+		? FMath::FRandRange(0.f, IdleSequence->GetPlayLength())
+		: 0.f;
 }
 
 void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -32,18 +34,19 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Speed = static_cast<float>(MovementComponent->Velocity.Size2D());
 	bIsMoving = Speed > MovingSpeedThreshold;
 
-	const float MaxSpeed = FMath::Max(MovementComponent->GetMaxSpeed(), 1.f);
-	NormalizedSpeed = FMath::Clamp(Speed / MaxSpeed, 0.f, 1.f);
+	if (const AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(OwnerCharacter))
+	{
+		bIsSprinting = Enemy->IsSprinting();
+	}
 }
 
-void UEnemyAnimInstance::PickRandomAnimations()
+UAnimSequence* UEnemyAnimInstance::GetMoveSequence() const
 {
-	IdleSequence = PickRandomFrom(IdleSequencePool);
-	MoveSequence = PickRandomFrom(MoveSequencePool);
-	
-	StartPosition = IdleSequence
-		? FMath::FRandRange(0.f, IdleSequence->GetPlayLength())
-		: 0.f;
+	if (bIsSprinting && SprintSequence)
+	{
+		return SprintSequence;
+	}
+	return RunSequence;
 }
 
 UAnimSequence* UEnemyAnimInstance::PickRandomFrom(const TArray<TObjectPtr<UAnimSequence>>& Pool) const

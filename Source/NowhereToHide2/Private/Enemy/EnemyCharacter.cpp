@@ -1,21 +1,19 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿#include "Enemy/EnemyCharacter.h"
 
-
-#include "Enemy/EnemyCharacter.h"
 #include "Enemy/EnemyAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 AEnemyCharacter::AEnemyCharacter()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	AIControllerClass = AEnemyAIController::StaticClass();
 	AutoPossessAI    = EAutoPossessAI::PlacedInWorldOrSpawned;
-
+	
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
-
+	
 	GetCharacterMovement()->bUseRVOAvoidance = true;
 }
 
@@ -23,15 +21,32 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	bCanSprint = FMath::FRand() < SprintChance;
+	
+	EffectiveRunSpeed = RunSpeed + FMath::FRandRange(-SpeedVariation, SpeedVariation);
+
+	SetSprinting(bCanSprint);
+	
+	ApplyMovementSpeed();
 }
 
-void AEnemyCharacter::Tick(float DeltaTime)
+void AEnemyCharacter::SetSprinting(bool bNewSprinting)
 {
-	Super::Tick(DeltaTime);
+	if (!bCanSprint)
+	{
+		bNewSprinting = false;
+	}
+
+	if (bIsSprinting == bNewSprinting) { return; }
+
+	bIsSprinting = bNewSprinting;
+	ApplyMovementSpeed();
 }
 
-void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AEnemyCharacter::ApplyMovementSpeed()
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	{
+		Move->MaxWalkSpeed = bIsSprinting ? SprintSpeed : EffectiveRunSpeed;
+	}
 }
-
