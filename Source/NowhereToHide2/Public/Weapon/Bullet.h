@@ -43,6 +43,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
 	TObjectPtr<UParticleSystem> ImpactVFX;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
+	TObjectPtr<UMaterialInterface> FleshDecalMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
+	TObjectPtr<USoundBase> FleshImpactSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
+	TObjectPtr<UParticleSystem> FleshImpactVFX;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Bullet", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> TracerMesh;
 
@@ -59,8 +68,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	void SpawnImpactDecal(const FHitResult& Impact);
-	void PlayImpactSound(const FHitResult& Impact);
-	void SpawnImpactVFX(const FHitResult& Impact);
+	void SpawnImpactDecal(const FHitResult& Impact, UMaterialInterface* InDecalMaterial);
+	void PlayImpactSound(const FHitResult& Impact, USoundBase* InSound);
+	void SpawnImpactVFX(const FHitResult& Impact, UParticleSystem* InVFX);
 	void ApplyImpactImpulse(const FHitResult& Impact);
 };

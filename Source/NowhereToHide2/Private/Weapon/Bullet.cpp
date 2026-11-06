@@ -41,9 +41,15 @@ void ABullet::OnProjectileStopped(const FHitResult& ImpactResult)
 {
 	ApplyImpactImpulse(ImpactResult);
 	
-	SpawnImpactVFX(ImpactResult);
-	SpawnImpactDecal(ImpactResult);
-	PlayImpactSound(ImpactResult);
+	const bool bHitCharacter = ImpactResult.GetActor() && ImpactResult.GetActor()->IsA<APawn>();
+
+	UMaterialInterface* SelectedDecal = (bHitCharacter && FleshDecalMaterial) ? FleshDecalMaterial : DecalMaterial;
+	USoundBase*         SelectedSound = (bHitCharacter && FleshImpactSound)  ? FleshImpactSound  : ImpactSound;
+	UParticleSystem*    SelectedVFX   = (bHitCharacter && FleshImpactVFX)    ? FleshImpactVFX    : ImpactVFX;
+
+	SpawnImpactVFX(ImpactResult, SelectedVFX);
+	SpawnImpactDecal(ImpactResult, SelectedDecal);
+	PlayImpactSound(ImpactResult, SelectedSound);
 	
 	Destroy();
 }
@@ -53,25 +59,25 @@ void ABullet::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ABullet::SpawnImpactDecal(const FHitResult& Impact)
+void ABullet::SpawnImpactDecal(const FHitResult& Impact, UMaterialInterface* InDecalMaterial)
 {
-	if (!DecalMaterial) { return; }
+	if (!InDecalMaterial) { return; }
 
 	const FRotator DecalRotation = (-Impact.ImpactNormal).Rotation();
-	
+
 	UDecalComponent* Decal;
 
 	if (USceneComponent* HitComponent = Impact.GetComponent())
 	{
 		Decal = UGameplayStatics::SpawnDecalAttached(
-			DecalMaterial, DecalSize, HitComponent, Impact.BoneName,
+			InDecalMaterial, DecalSize, HitComponent, Impact.BoneName,
 			Impact.ImpactPoint, DecalRotation,
 			EAttachLocation::KeepWorldPosition, DecalLifeSpan);
 	}
 	else
 	{
 		Decal = UGameplayStatics::SpawnDecalAtLocation(
-			this, DecalMaterial, DecalSize, Impact.ImpactPoint,
+			this, InDecalMaterial, DecalSize, Impact.ImpactPoint,
 			DecalRotation, DecalLifeSpan);
 	}
 
@@ -81,30 +87,22 @@ void ABullet::SpawnImpactDecal(const FHitResult& Impact)
 	}
 }
 
-void ABullet::PlayImpactSound(const FHitResult& Impact)
+void ABullet::PlayImpactSound(const FHitResult& Impact, USoundBase* InSound)
 {
-	if (!ImpactSound) { return; }
+	if (!InSound) { return; }
 
 	UGameplayStatics::PlaySoundAtLocation(
-		this,
-		ImpactSound,
-		Impact.Location,
-		FRotator::ZeroRotator,
-		1.f,
-		FMath::FRandRange(0.95f, 1.05f));
+		this, InSound, Impact.Location, FRotator::ZeroRotator,
+		1.f, FMath::FRandRange(0.95f, 1.05f));
 }
 
-void ABullet::SpawnImpactVFX(const FHitResult& Impact)
+void ABullet::SpawnImpactVFX(const FHitResult& Impact, UParticleSystem* InVFX)
 {
-	if (!ImpactVFX) { return; }
+	if (!InVFX) { return; }
 
 	UGameplayStatics::SpawnEmitterAtLocation(
-		GetWorld(),
-		ImpactVFX,
-		Impact.Location,
-		Impact.ImpactNormal.Rotation(),
-		true,
-		EPSCPoolMethod::AutoRelease);
+		GetWorld(), InVFX, Impact.Location, Impact.ImpactNormal.Rotation(),
+		true, EPSCPoolMethod::AutoRelease);
 }
 
 void ABullet::ApplyImpactImpulse(const FHitResult& Impact)
