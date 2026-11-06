@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UHealthComponent;
 class URectLightComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -23,6 +24,8 @@ public:
 	
 	UCombatComponent* GetCombatComponent() const { return CombatComponent; }
 
+	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -34,6 +37,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Movement", meta = (ClampMin = "0.1"))
 	float SprintInterpSpeed = 8.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Health", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UHealthComponent> HealthComponent;
 
 	virtual bool CanJumpInternal_Implementation() const override;
 

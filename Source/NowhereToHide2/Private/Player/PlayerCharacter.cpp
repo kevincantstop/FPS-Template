@@ -9,6 +9,7 @@
 #include "Components/RectLightComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Health/HealthComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -30,6 +31,8 @@ APlayerCharacter::APlayerCharacter()
 	RectLight->SetupAttachment(GetCapsuleComponent());
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
 	GetMesh()->CastShadow = false;
 }

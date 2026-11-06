@@ -53,6 +53,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon", meta = (ClampMin = "0.0"))
 	float ImpactImpulse = 50.f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon", meta = (ClampMin = "0.0"))
+	float Damage = 25.f;
+
 	UFUNCTION()
 	void OnProjectileStopped(const FHitResult& ImpactResult);
 

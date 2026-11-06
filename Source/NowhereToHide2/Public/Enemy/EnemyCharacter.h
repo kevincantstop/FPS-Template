@@ -4,6 +4,8 @@
 #include "GameFramework/Character.h"
 #include "EnemyCharacter.generated.h"
 
+class UHealthComponent;
+
 UCLASS()
 class NOWHERETOHIDE2_API AEnemyCharacter : public ACharacter
 {
@@ -23,6 +25,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
 	void PlayHitReaction(const FHitResult& Impact);
+
+	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
+	void ReceiveBulletHit(const FHitResult& Impact, float BaseDamage);
+
+	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -44,6 +51,9 @@ protected:
 	
 	UPROPERTY(VisibleInstanceOnly, Category = "NowhereToHide|Movement")
 	bool bCanSprint = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat", meta = (ClampMin = "1.0"))
+	float HeadshotMultiplier = 3.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Visual")
 	TArray<TObjectPtr<USkeletalMesh>> MeshPool;
@@ -72,6 +82,9 @@ protected:
 		TEXT("clavicle_r"), TEXT("upperarm_r"), TEXT("lowerarm_r"), TEXT("hand_r")
 	};
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Health", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UHealthComponent> HealthComponent;
+
 private:
 	void ApplyMovementSpeed();
 	void ApplyRandomMesh();
@@ -79,4 +92,5 @@ private:
 	float EffectiveRunSpeed = 200.f;
 
 	UAnimMontage* SelectHitMontage(FName BoneName) const;
+	FName ResolveHitBone(const FHitResult& Impact) const;
 };

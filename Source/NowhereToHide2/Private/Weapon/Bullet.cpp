@@ -4,6 +4,7 @@
 #include "Components/SphereComponent.h"
 #include "Enemy/EnemyCharacter.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Health/HealthComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Weapon/BulletFXData.h"
 
@@ -59,7 +60,14 @@ void ABullet::OnProjectileStopped(const FHitResult& ImpactResult)
 	}
 	if (AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(ImpactResult.GetActor()))
 	{
-		Enemy->PlayHitReaction(ImpactResult);
+		Enemy->ReceiveBulletHit(ImpactResult, Damage);
+	}
+	else if (AActor* HitActor = ImpactResult.GetActor())
+	{
+		if (UHealthComponent* Health = HitActor->FindComponentByClass<UHealthComponent>())
+		{
+			Health->ApplyDamage(Damage);
+		}
 	}
 
 	Destroy();

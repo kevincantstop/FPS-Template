@@ -2,6 +2,7 @@
 
 #include "Enemy/EnemyAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Health/HealthComponent.h"
 
 static bool BoneMatchesAnyKeyword(const FString& BoneLower, const TArray<FString>& Keywords)
 {
@@ -28,6 +29,8 @@ AEnemyCharacter::AEnemyCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
 	
 	GetCharacterMovement()->bUseRVOAvoidance = true;
+
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 }
 
 void AEnemyCharacter::BeginPlay()
@@ -89,11 +92,7 @@ void AEnemyCharacter::PlayHitReaction(const FHitResult& Impact)
 	
 	if (Anim->IsAnyMontagePlaying()) { return; }
 	
-	FName BoneName = Impact.BoneName;
-	if (BoneName.IsNone())
-	{
-		BoneName = SkelMesh->FindClosestBone(Impact.ImpactPoint);
-	}
+	const FName BoneName = ResolveHitBone(Impact);
 
 	UAnimMontage* Montage = SelectHitMontage(BoneName);
 	if (!Montage) { return; }
@@ -110,4 +109,32 @@ UAnimMontage* AEnemyCharacter::SelectHitMontage(FName BoneName) const
 	if (BoneMatchesAnyKeyword(Bone, RightArmBoneKeywords)) { return HitRightArmMontage; }
 
 	return nullptr;
+}
+
+FName AEnemyCharacter::ResolveHitBone(const FHitResult& Impact) const
+{
+	if (!Impact.BoneName.IsNone())
+	{
+		return Impact.BoneName;
+	}
+	const USkeletalMeshComponent* SkelMesh = GetMesh();
+	return SkelMesh ? SkelMesh->FindClosestBone(Impact.ImpactPoint) : NAME_None;
+}
+
+void AEnemyCharacter::ReceiveBulletHit(const FHitResult& Impact, float BaseDamage)
+{
+	const FName BoneName = ResolveHitBone(Impact);
+	const bool bHeadshot = BoneMatchesAnyKeyword(BoneName.ToString().ToLower(), HeadBoneKeywords);
+
+	PlayHitReaction(Impact);
+
+	const float FinalDamage = BaseDamage * (bHeadshot ? HeadshotMultiplier : 1.f);
+
+	if (HealthComponent)
+	{
+		HealthComponent->ApplyDamage(FinalDamage);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("[Enemy] bone=%s damage=%.1f%s"),
+		*BoneName.ToString(), FinalDamage, bHeadshot ? TEXT(" (HEADSHOT)") : TEXT(""));
 }
