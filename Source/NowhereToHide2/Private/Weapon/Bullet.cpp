@@ -4,6 +4,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Weapon/BulletFXData.h"
 
 ABullet::ABullet()
 {
@@ -40,17 +41,22 @@ void ABullet::BeginPlay()
 void ABullet::OnProjectileStopped(const FHitResult& ImpactResult)
 {
 	ApplyImpactImpulse(ImpactResult);
-	
-	const bool bHitCharacter = ImpactResult.GetActor() && ImpactResult.GetActor()->IsA<APawn>();
 
-	UMaterialInterface* SelectedDecal = (bHitCharacter && FleshDecalMaterial) ? FleshDecalMaterial : DecalMaterial;
-	USoundBase*         SelectedSound = (bHitCharacter && FleshImpactSound)  ? FleshImpactSound  : ImpactSound;
-	UParticleSystem*    SelectedVFX   = (bHitCharacter && FleshImpactVFX)    ? FleshImpactVFX    : ImpactVFX;
-
-	SpawnImpactVFX(ImpactResult, SelectedVFX);
-	SpawnImpactDecal(ImpactResult, SelectedDecal);
-	PlayImpactSound(ImpactResult, SelectedSound);
+	const bool bHitFlesh = ImpactResult.GetActor() && ImpactResult.GetActor()->IsA<APawn>();
+	const FName DesiredRow = bHitFlesh ? FleshImpactRow : DefaultImpactRow;
 	
+	const FBulletFXEntry* Entry = ImpactFX ? ImpactFX->FindEntry(DesiredRow) : nullptr;
+	if (!Entry && ImpactFX && DesiredRow != DefaultImpactRow)
+	{
+		Entry = ImpactFX->FindEntry(DefaultImpactRow);
+	}
+	if (Entry)
+	{
+		SpawnImpactVFX(ImpactResult, Entry->ImpactVFX);
+		SpawnImpactDecal(ImpactResult, Entry->DecalMaterial);
+		PlayImpactSound(ImpactResult, Entry->ImpactSound);
+	}
+
 	Destroy();
 }
 

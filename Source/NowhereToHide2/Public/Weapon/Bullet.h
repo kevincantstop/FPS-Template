@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Bullet.generated.h"
 
+class UBulletFXData;
 class UProjectileMovementComponent;
 class USphereComponent;
 
@@ -35,22 +36,13 @@ protected:
 	float DecalLifeSpan = 10.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
-	TObjectPtr<UMaterialInterface> DecalMaterial;
-
+	TObjectPtr<UBulletFXData> ImpactFX;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
-	TObjectPtr<USoundBase> ImpactSound;
-
+	FName DefaultImpactRow = TEXT("Concrete");
+	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
-	TObjectPtr<UParticleSystem> ImpactVFX;
-
-	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
-	TObjectPtr<UMaterialInterface> FleshDecalMaterial;
-
-	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
-	TObjectPtr<USoundBase> FleshImpactSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
-	TObjectPtr<UParticleSystem> FleshImpactVFX;
+	FName FleshImpactRow = TEXT("Body");
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Bullet", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> TracerMesh;
