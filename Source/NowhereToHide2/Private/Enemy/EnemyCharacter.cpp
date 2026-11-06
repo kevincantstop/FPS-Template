@@ -3,6 +3,19 @@
 #include "Enemy/EnemyAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+static bool BoneMatchesAnyKeyword(const FString& BoneLower, const TArray<FString>& Keywords)
+{
+	for (const FString& Keyword : Keywords)
+	{
+		const FString Trimmed = Keyword.TrimStartAndEnd().ToLower();
+		if (!Trimmed.IsEmpty() && BoneLower.Contains(Trimmed))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 AEnemyCharacter::AEnemyCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -64,4 +77,37 @@ void AEnemyCharacter::ApplyRandomMesh()
 	if (!Picked) { return; }
 
 	MeshComp->SetSkeletalMeshAsset(Picked);
+}
+
+void AEnemyCharacter::PlayHitReaction(const FHitResult& Impact)
+{
+	USkeletalMeshComponent* SkelMesh = GetMesh();
+	if (!SkelMesh) { return; }
+
+	UAnimInstance* Anim = SkelMesh->GetAnimInstance();
+	if (!Anim) { return; }
+	
+	if (Anim->IsAnyMontagePlaying()) { return; }
+	
+	FName BoneName = Impact.BoneName;
+	if (BoneName.IsNone())
+	{
+		BoneName = SkelMesh->FindClosestBone(Impact.ImpactPoint);
+	}
+
+	UAnimMontage* Montage = SelectHitMontage(BoneName);
+	if (!Montage) { return; }
+
+	Anim->Montage_Play(Montage, 1.f);
+}
+
+UAnimMontage* AEnemyCharacter::SelectHitMontage(FName BoneName) const
+{
+	const FString Bone = BoneName.ToString().ToLower();
+
+	if (BoneMatchesAnyKeyword(Bone, HeadBoneKeywords))     { return HitHeadMontage; }
+	if (BoneMatchesAnyKeyword(Bone, LeftArmBoneKeywords))  { return HitLeftArmMontage; }
+	if (BoneMatchesAnyKeyword(Bone, RightArmBoneKeywords)) { return HitRightArmMontage; }
+
+	return nullptr;
 }

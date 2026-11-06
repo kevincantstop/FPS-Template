@@ -21,6 +21,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Movement")
 	bool CanSprint() const { return bCanSprint; }
 
+	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
+	void PlayHitReaction(const FHitResult& Impact);
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -45,9 +48,35 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Visual")
 	TArray<TObjectPtr<USkeletalMesh>> MeshPool;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TObjectPtr<UAnimMontage> HitHeadMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TObjectPtr<UAnimMontage> HitLeftArmMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TObjectPtr<UAnimMontage> HitRightArmMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TArray<FString> HeadBoneKeywords = { TEXT("head") };
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TArray<FString> LeftArmBoneKeywords =
+	{
+		TEXT("clavicle_l"), TEXT("upperarm_l"), TEXT("lowerarm_l"), TEXT("hand_l")
+	};
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TArray<FString> RightArmBoneKeywords =
+	{
+		TEXT("clavicle_r"), TEXT("upperarm_r"), TEXT("lowerarm_r"), TEXT("hand_r")
+	};
+
 private:
 	void ApplyMovementSpeed();
 	void ApplyRandomMesh();
 	
 	float EffectiveRunSpeed = 200.f;
+
+	UAnimMontage* SelectHitMontage(FName BoneName) const;
 };

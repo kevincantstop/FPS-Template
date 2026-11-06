@@ -2,6 +2,7 @@
 
 #include "Components/DecalComponent.h"
 #include "Components/SphereComponent.h"
+#include "Enemy/EnemyCharacter.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Weapon/BulletFXData.h"
@@ -55,6 +56,10 @@ void ABullet::OnProjectileStopped(const FHitResult& ImpactResult)
 		SpawnImpactVFX(ImpactResult, Entry->ImpactVFX);
 		SpawnImpactDecal(ImpactResult, Entry->DecalMaterial);
 		PlayImpactSound(ImpactResult, Entry->ImpactSound);
+	}
+	if (AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(ImpactResult.GetActor()))
+	{
+		Enemy->PlayHitReaction(ImpactResult);
 	}
 
 	Destroy();
