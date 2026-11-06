@@ -47,6 +47,7 @@ void AEnemyAIController::UpdateChase()
 	}
 
 	const EPathFollowingRequestResult::Type Result = MoveToActor(Player, AcceptanceRadius);
+	SetFocus(Player);
 
 	if (Result == EPathFollowingRequestResult::Failed && !bLoggedNavFailure)
 	{

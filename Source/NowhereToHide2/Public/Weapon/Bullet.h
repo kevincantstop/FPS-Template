@@ -43,7 +43,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon")
 	TObjectPtr<UParticleSystem> ImpactVFX;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bullet|Tracer", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Bullet", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> TracerMesh;
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Weapon", meta = (ClampMin = "0.1"))
