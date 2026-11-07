@@ -44,6 +44,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
 	TObjectPtr<USoundBase> HitSound;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TObjectPtr<USoundBase> DeathSound;
+
 	virtual bool CanJumpInternal_Implementation() const override;
 
 public:	
@@ -84,6 +87,9 @@ public:
 
 	UFUNCTION()
 	void HandleHealthChanged(float NewHealth, float DeltaHealth);
+
+	UFUNCTION()
+	void HandleDeath();
 	
 private:
 	UPROPERTY(VisibleAnywhere)

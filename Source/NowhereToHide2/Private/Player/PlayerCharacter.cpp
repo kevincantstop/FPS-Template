@@ -47,6 +47,15 @@ void APlayerCharacter::BeginPlay()
 	if (HealthComponent)
 	{
 		HealthComponent->OnHealthChanged.AddDynamic(this, &APlayerCharacter::HandleHealthChanged);
+		HealthComponent->OnDeath.AddDynamic(this, &APlayerCharacter::HandleDeath);
+	}
+}
+
+void APlayerCharacter::HandleDeath()
+{
+	if (DeathSound)
+	{
+		UGameplayStatics::SpawnSound2D(this, DeathSound);
 	}
 }
 
