@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Health/HealthComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -42,6 +43,21 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	ApplyMovementSpeed();
+
+	if (HealthComponent)
+	{
+		HealthComponent->OnHealthChanged.AddDynamic(this, &APlayerCharacter::HandleHealthChanged);
+	}
+}
+
+void APlayerCharacter::HandleHealthChanged(float NewHealth, float DeltaHealth)
+{
+	if (DeltaHealth >= 0.f) { return; }
+
+	if (HitSound && GetMesh())
+	{
+		UGameplayStatics::SpawnSoundAttached(HitSound, GetMesh());
+	}
 }
 
 bool APlayerCharacter::CanJumpInternal_Implementation() const

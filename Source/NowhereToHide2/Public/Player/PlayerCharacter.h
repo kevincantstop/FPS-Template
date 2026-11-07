@@ -41,6 +41,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Health", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UHealthComponent> HealthComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TObjectPtr<USoundBase> HitSound;
+
 	virtual bool CanJumpInternal_Implementation() const override;
 
 public:	
@@ -78,6 +81,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
 	void Reload();
+
+	UFUNCTION()
+	void HandleHealthChanged(float NewHealth, float DeltaHealth);
 	
 private:
 	UPROPERTY(VisibleAnywhere)
