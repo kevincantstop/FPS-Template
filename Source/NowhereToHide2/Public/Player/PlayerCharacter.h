@@ -65,6 +65,12 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Camera", meta = (ClampMin = "0.1"))
 	float DeathPostProcessFadeSpeed = 1.5f;
+	
+	UPROPERTY(EditAnywhere, Category = "NowhereToHide|Debug")
+	bool bDebugShowHitPostProcess = false;
+	
+	UPROPERTY(EditAnywhere, Category = "NowhereToHide|Debug")
+	bool bDebugShowDeathPostProcess = false;
 
 	virtual bool CanJumpInternal_Implementation() const override;
 

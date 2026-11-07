@@ -87,6 +87,10 @@ void APlayerCharacter::HandleHealthChanged(float NewHealth, float DeltaHealth)
 			PC->ClientStartCameraShake(HitCameraShake, 5);
 		}
 	}
+	if (HitPostProcess)
+	{
+		HitPostProcess->BlendWeight = FMath::Max(HitPostProcess->BlendWeight, HitPostProcessWeight);
+	}
 }
 
 bool APlayerCharacter::CanJumpInternal_Implementation() const
@@ -183,14 +187,30 @@ void APlayerCharacter::UpdateMovementSpeed(float DeltaTime)
 void APlayerCharacter::UpdatePostProcess(float DeltaTime)
 {
 	if (!HitPostProcess || !DeathPostProcess) { return; }
+	
+	if (bDebugShowHitPostProcess)
+	{
+		HitPostProcess->BlendWeight = 1.f;
+	}
+	else
+	{
+		const bool bDead = HealthComponent && HealthComponent->IsDead();
+		const float HitFadeSpeed = bDead ? 6.f : HitPostProcessFadeSpeed;
 
-	const bool bDead = HealthComponent && HealthComponent->IsDead();
+		HitPostProcess->BlendWeight = FMath::FInterpTo(
+			HitPostProcess->BlendWeight, 0.f, DeltaTime, HitFadeSpeed);
+	}
 	
-	const float HitFadeSpeed = bDead ? 6.f : HitPostProcessFadeSpeed;
-	HitPostProcess->BlendWeight = FMath::FInterpTo(
-		HitPostProcess->BlendWeight, 0.f, DeltaTime, HitFadeSpeed);
-	
-	DeathPostProcess->BlendWeight = FMath::FInterpTo(
-		DeathPostProcess->BlendWeight, bDead ? 1.f : 0.f, DeltaTime, DeathPostProcessFadeSpeed);
+	if (bDebugShowDeathPostProcess)
+	{
+		DeathPostProcess->BlendWeight = 1.f;
+	}
+	else
+	{
+		const bool bDead = HealthComponent && HealthComponent->IsDead();
+
+		DeathPostProcess->BlendWeight = FMath::FInterpTo(
+			DeathPostProcess->BlendWeight, bDead ? 1.f : 0.f, DeltaTime, DeathPostProcessFadeSpeed);
+	}
 }
 
