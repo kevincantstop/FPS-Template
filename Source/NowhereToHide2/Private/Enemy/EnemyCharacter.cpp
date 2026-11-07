@@ -176,4 +176,9 @@ void AEnemyCharacter::EnterRagdoll()
 	SkelMesh->SetAllBodiesSimulatePhysics(true);
 	SkelMesh->WakeAllRigidBodies();
 	SkelMesh->bBlendPhysics = true;
+
+	if (CorpseLifeSpan > 0.f)
+	{
+		SetLifeSpan(CorpseLifeSpan);
+	}
 }

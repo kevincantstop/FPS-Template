@@ -84,6 +84,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Health", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UHealthComponent> HealthComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat", meta = (ClampMin = "0.0"))
+	float CorpseLifeSpan = 30.f;
+
 private:
 	void ApplyMovementSpeed();
 	void ApplyRandomMesh();
