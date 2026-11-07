@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Combat/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/PostProcessComponent.h"
 #include "Components/RectLightComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -34,6 +35,18 @@ APlayerCharacter::APlayerCharacter()
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+
+	HitPostProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("HitPostProcess"));
+	HitPostProcess->SetupAttachment(Camera);
+	HitPostProcess->bUnbound = true;
+	HitPostProcess->Priority = 10.f;
+	HitPostProcess->BlendWeight = 0.f;
+
+	DeathPostProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("DeathPostProcess"));
+	DeathPostProcess->SetupAttachment(Camera);
+	DeathPostProcess->bUnbound = true;
+	DeathPostProcess->Priority = 20.f;
+	DeathPostProcess->BlendWeight = 0.f;
 
 	GetMesh()->CastShadow = false;
 }
@@ -71,7 +84,7 @@ void APlayerCharacter::HandleHealthChanged(float NewHealth, float DeltaHealth)
 	{
 		if (APlayerController* PC = Cast<APlayerController>(GetController()))
 		{
-			PC->ClientStartCameraShake(HitCameraShake);
+			PC->ClientStartCameraShake(HitCameraShake, 5);
 		}
 	}
 }
@@ -86,6 +99,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	
 	UpdateMovementSpeed(DeltaTime);
+	UpdatePostProcess(DeltaTime);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -164,5 +178,19 @@ void APlayerCharacter::UpdateMovementSpeed(float DeltaTime)
 	const float TargetSpeed = bIsSprinting ? SprintSpeed : WalkSpeed;
 	
 	Move->MaxWalkSpeed = FMath::FInterpTo(Move->MaxWalkSpeed, TargetSpeed, DeltaTime, SprintInterpSpeed);
+}
+
+void APlayerCharacter::UpdatePostProcess(float DeltaTime)
+{
+	if (!HitPostProcess || !DeathPostProcess) { return; }
+
+	const bool bDead = HealthComponent && HealthComponent->IsDead();
+	
+	const float HitFadeSpeed = bDead ? 6.f : HitPostProcessFadeSpeed;
+	HitPostProcess->BlendWeight = FMath::FInterpTo(
+		HitPostProcess->BlendWeight, 0.f, DeltaTime, HitFadeSpeed);
+	
+	DeathPostProcess->BlendWeight = FMath::FInterpTo(
+		DeathPostProcess->BlendWeight, bDead ? 1.f : 0.f, DeltaTime, DeathPostProcessFadeSpeed);
 }
 

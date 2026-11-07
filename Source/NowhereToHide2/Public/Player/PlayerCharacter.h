@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UPostProcessComponent;
 class UHealthComponent;
 class URectLightComponent;
 class UCameraComponent;
@@ -49,13 +50,28 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
 	TSubclassOf<UCameraShakeBase> HitCameraShake;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Camera", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UPostProcessComponent> HitPostProcess;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Camera", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UPostProcessComponent> DeathPostProcess;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Camera", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float HitPostProcessWeight = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Camera", meta = (ClampMin = "0.1"))
+	float HitPostProcessFadeSpeed = 3.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Camera", meta = (ClampMin = "0.1"))
+	float DeathPostProcessFadeSpeed = 1.5f;
 
 	virtual bool CanJumpInternal_Implementation() const override;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
 	
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Movement")
 	void SetSprinting(bool bNewSprinting);
@@ -118,4 +134,6 @@ private:
 	void ApplyMovementSpeed();
 
 	void UpdateMovementSpeed(float DeltaTime);
+
+	void UpdatePostProcess(float DeltaTime);
 };
