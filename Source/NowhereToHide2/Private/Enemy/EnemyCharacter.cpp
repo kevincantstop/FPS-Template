@@ -34,6 +34,43 @@ AEnemyCharacter::AEnemyCharacter()
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 }
 
+void AEnemyCharacter::PerformAttackHitCheck()
+{
+	if (IsDead()) { return; }
+
+	UWorld* World = GetWorld();
+	if (!World) { return; }
+
+	USkeletalMeshComponent* SkelMesh = GetMesh();
+	
+	const FVector Start = (SkelMesh && SkelMesh->DoesSocketExist(AttackOriginBone))
+		? SkelMesh->GetSocketLocation(AttackOriginBone)
+		: GetActorLocation() + FVector(0.f, 0.f, 50.f);
+
+	const FVector End = Start + GetActorForwardVector() * AttackHitDistance;
+
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(ZombieAttack), /*bTraceComplex*/ false, this);
+	Params.AddIgnoredActor(this);
+
+	FHitResult Hit;
+	const bool bHit = World->SweepSingleByChannel(
+		Hit, Start, End, FQuat::Identity,
+		ECC_GameTraceChannel2,                        // ZombieAttack
+		FCollisionShape::MakeSphere(AttackHitRadius),
+		Params);
+
+	if (bHit)
+	{
+		if (AActor* HitActor = Hit.GetActor())
+		{
+			if (UHealthComponent* Health = HitActor->FindComponentByClass<UHealthComponent>())
+			{
+				Health->ApplyDamage(AttackDamage);
+			}
+		}
+	}
+}
+
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();

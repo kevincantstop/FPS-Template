@@ -43,6 +43,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Combat")
 	float GetAttackRange() const { return AttackRange; }
 
+	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
+	void PerformAttackHitCheck();
+
 	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
 protected:
@@ -110,6 +113,18 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, Category = "NowhereToHide|Combat")
 	bool bIsAttacking = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat", meta = (ClampMin = "0.0"))
+	float AttackDamage = 15.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat", meta = (ClampMin = "1.0"))
+	float AttackHitRadius = 45.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat", meta = (ClampMin = "1.0"))
+	float AttackHitDistance = 110.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	FName AttackOriginBone = TEXT("spine_03");
 
 	UFUNCTION()
 	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
