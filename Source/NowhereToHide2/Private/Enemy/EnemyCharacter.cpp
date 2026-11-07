@@ -178,12 +178,13 @@ void AEnemyCharacter::EnterRagdoll()
 {
 	USkeletalMeshComponent* SkelMesh = GetMesh();
 	if (!SkelMesh) { return; }
-
+	
 	SkelMesh->SetCollisionProfileName(TEXT("Ragdoll"));
 	SkelMesh->SetAllBodiesSimulatePhysics(true);
 	SkelMesh->WakeAllRigidBodies();
 	SkelMesh->bBlendPhysics = true;
-	SkelMesh->SetComponentTickEnabled(false);
+	
+	SkelMesh->SetAnimInstanceClass(nullptr);
 
 	if (CorpseLifeSpan > 0.f)
 	{
