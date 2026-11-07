@@ -37,6 +37,7 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (const AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(OwnerCharacter))
 	{
 		bIsSprinting = Enemy->IsSprinting();
+		bIsDead      = Enemy->IsDead();
 	}
 }
 

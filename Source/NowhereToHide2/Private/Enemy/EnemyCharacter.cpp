@@ -87,6 +87,8 @@ void AEnemyCharacter::ApplyRandomMesh()
 
 void AEnemyCharacter::PlayHitReaction(FName ResolvedBone)
 {
+	if (IsDead()) { return; }
+	
 	USkeletalMeshComponent* SkelMesh = GetMesh();
 	if (!SkelMesh) { return; }
 
@@ -110,6 +112,11 @@ UAnimMontage* AEnemyCharacter::SelectHitMontage(FName BoneName) const
 	if (BoneMatchesAnyKeyword(Bone, RightArmBoneKeywords)) { return HitRightArmMontage; }
 
 	return nullptr;
+}
+
+bool AEnemyCharacter::IsDead() const
+{
+	return HealthComponent && HealthComponent->IsDead();
 }
 
 FName AEnemyCharacter::ResolveHitBone(const FHitResult& Impact) const
@@ -176,6 +183,7 @@ void AEnemyCharacter::EnterRagdoll()
 	SkelMesh->SetAllBodiesSimulatePhysics(true);
 	SkelMesh->WakeAllRigidBodies();
 	SkelMesh->bBlendPhysics = true;
+	SkelMesh->SetComponentTickEnabled(false);
 
 	if (CorpseLifeSpan > 0.f)
 	{

@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
 	void ReceiveBulletHit(const FHitResult& Impact, float BaseDamage);
 
+	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Combat")
+	bool IsDead() const;
+
 	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
 protected:

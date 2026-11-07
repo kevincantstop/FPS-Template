@@ -51,6 +51,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "NowhereToHide|Locomotion", meta = (AllowPrivateAccess = "true"))
 	float StartPosition = 0.f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "NowhereToHide|Locomotion", meta = (AllowPrivateAccess = "true"))
+	bool bIsDead = false;
 	
 	UPROPERTY(Transient)
 	TObjectPtr<ACharacter> OwnerCharacter;
