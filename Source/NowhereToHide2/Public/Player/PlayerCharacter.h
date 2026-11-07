@@ -38,7 +38,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Movement", meta = (ClampMin = "0.1"))
 	float SprintInterpSpeed = 8.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Health", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UHealthComponent> HealthComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
@@ -101,7 +101,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Light", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URectLightComponent> RectLight;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Combat", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCombatComponent> CombatComponent;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "NowhereToHide|Aim")

@@ -96,7 +96,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
 	TArray<FString> RightArmBoneKeywords = { TEXT("clavicle_r"), TEXT("upperarm_r"), TEXT("lowerarm_r"), TEXT("hand_r") };
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Health", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UHealthComponent> HealthComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat", meta = (ClampMin = "0.0"))
