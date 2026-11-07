@@ -1,4 +1,6 @@
 ﻿#include "Enemy/EnemyAIController.h"
+
+#include "Enemy/EnemyCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Navigation/PathFollowingComponent.h"
 
@@ -31,29 +33,29 @@ void AEnemyAIController::UpdateChase()
 
 	const float DistSq = FVector::DistSquared2D(
 		Player->GetActorLocation(), MyPawn->GetActorLocation());
+
+	AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(MyPawn);
+	if (!Enemy || Enemy->IsDead()) { return; }
 	
-	if (DistSq > FMath::Square(ChaseRadius))
+	if (DistSq <= FMath::Square(Enemy->GetAttackRange()))
 	{
 		if (GetMoveStatus() == EPathFollowingStatus::Moving)
 		{
 			StopMovement();
 		}
+		
+		const FVector ToPlayer = Player->GetActorLocation() - MyPawn->GetActorLocation();
+		MyPawn->SetActorRotation(FRotator(0.f, ToPlayer.Rotation().Yaw, 0.f));
+
+		Enemy->TryAttack();
 		return;
 	}
 	
-	if (DistSq <= FMath::Square(AcceptanceRadius))
+	if (DistSq > FMath::Square(ChaseRadius))
 	{
+		if (GetMoveStatus() == EPathFollowingStatus::Moving) { StopMovement(); }
 		return;
 	}
 
-	const EPathFollowingRequestResult::Type Result = MoveToActor(Player, AcceptanceRadius);
-	SetFocus(Player);
-
-	if (Result == EPathFollowingRequestResult::Failed && !bLoggedNavFailure)
-	{
-		bLoggedNavFailure = true;
-		UE_LOG(LogTemp, Warning,
-			TEXT("[Enemy] MoveTo failed for %s. Check that a NavMeshBoundsVolume covers both the AI and the player."),
-			*GetNameSafe(MyPawn));
-	}
+	MoveToActor(Player, AcceptanceRadius);
 }

@@ -39,6 +39,11 @@ void AEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	HealthComponent->OnDeath.AddDynamic(this, &AEnemyCharacter::HandleDeath);
+
+	if (UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr)
+	{
+		Anim->OnMontageEnded.AddDynamic(this, &AEnemyCharacter::OnAttackMontageEnded);
+	}
 	
 	ApplyRandomMesh();
 	
@@ -49,6 +54,34 @@ void AEnemyCharacter::BeginPlay()
 	SetSprinting(bCanSprint);
 	
 	ApplyMovementSpeed();
+}
+
+bool AEnemyCharacter::TryAttack()
+{
+	if (IsDead() || bIsAttacking) { return false; }
+	if (AttackMontages.Num() == 0) { return false; }
+	
+	if (GetWorld()->GetTimeSeconds() < NextAttackTime) { return false; }
+
+	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (!Anim) { return false; }
+
+	UAnimMontage* Montage = AttackMontages[FMath::RandRange(0, AttackMontages.Num() - 1)];
+	if (!Montage) { return false; }
+
+	bIsAttacking = true;
+	Anim->Montage_Play(Montage, 1.f);
+
+	return true;
+}
+
+void AEnemyCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (!bIsAttacking) { return; }
+	if (!AttackMontages.Contains(Montage)) { return; }
+
+	bIsAttacking = false;
+	NextAttackTime = GetWorld()->GetTimeSeconds() + AttackCooldown;
 }
 
 void AEnemyCharacter::SetSprinting(bool bNewSprinting)
@@ -149,6 +182,8 @@ void AEnemyCharacter::ReceiveBulletHit(const FHitResult& Impact, float BaseDamag
 
 void AEnemyCharacter::HandleDeath()
 {
+	bIsAttacking = false;
+	
 	if (AAIController* AI = Cast<AAIController>(GetController()))
 	{
 		AI->StopMovement();

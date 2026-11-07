@@ -34,6 +34,15 @@ public:
 	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Combat")
 	bool IsDead() const;
 
+	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
+	bool TryAttack();
+
+	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Combat")
+	bool IsAttacking() const { return bIsAttacking; }
+	
+	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Combat")
+	float GetAttackRange() const { return AttackRange; }
+
 	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
 protected:
@@ -90,11 +99,28 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat", meta = (ClampMin = "0.0"))
 	float CorpseLifeSpan = 30.f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TArray<TObjectPtr<UAnimMontage>> AttackMontages;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat", meta = (ClampMin = "0.0"))
+	float AttackRange = 150.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat", meta = (ClampMin = "0.0"))
+	float AttackCooldown = 0.8f;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "NowhereToHide|Combat")
+	bool bIsAttacking = false;
+
+	UFUNCTION()
+	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
 private:
 	void ApplyMovementSpeed();
 	void ApplyRandomMesh();
 	
 	float EffectiveRunSpeed = 200.f;
+
+	float NextAttackTime = 0.f;
 
 	UAnimMontage* SelectHitMontage(FName BoneName) const;
 	FName ResolveHitBone(const FHitResult& Impact) const;
