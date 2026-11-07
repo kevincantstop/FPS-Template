@@ -10,7 +10,7 @@
 
 ABullet::ABullet()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionSphere"));
 	SetRootComponent(CollisionSphere);
@@ -73,11 +73,6 @@ void ABullet::OnProjectileStopped(const FHitResult& ImpactResult)
 	Destroy();
 }
 
-void ABullet::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void ABullet::SpawnImpactDecal(const FHitResult& Impact, UMaterialInterface* InDecalMaterial)
 {
 	if (!InDecalMaterial) { return; }
@@ -134,5 +129,5 @@ void ABullet::ApplyImpactImpulse(const FHitResult& Impact)
 	const FVector Direction = -Impact.ImpactNormal;
 	const FVector Impulse = Direction * ProjectileMovement->InitialSpeed * ImpactImpulse;
 
-	HitComponent->AddImpulseAtLocation(Impulse, Impact.Location, Impact.BoneName);
+	HitComponent->AddImpulseAtLocation(Impulse, Impact.ImpactPoint, Impact.BoneName);
 }

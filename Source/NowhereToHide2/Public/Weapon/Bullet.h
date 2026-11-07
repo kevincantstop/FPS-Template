@@ -59,9 +59,6 @@ protected:
 	UFUNCTION()
 	void OnProjectileStopped(const FHitResult& ImpactResult);
 
-public:
-	virtual void Tick(float DeltaTime) override;
-
 private:
 	void SpawnImpactDecal(const FHitResult& Impact, UMaterialInterface* InDecalMaterial);
 	void PlayImpactSound(const FHitResult& Impact, USoundBase* InSound);

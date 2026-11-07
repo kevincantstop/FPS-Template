@@ -5,6 +5,8 @@
 #include "EnemyCharacter.generated.h"
 
 class UHealthComponent;
+class USkeletalMesh;
+class UAnimMontage;
 
 UCLASS()
 class NOWHERETOHIDE2_API AEnemyCharacter : public ACharacter
@@ -24,7 +26,7 @@ public:
 	bool CanSprint() const { return bCanSprint; }
 
 	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
-	void PlayHitReaction(const FHitResult& Impact);
+	void PlayHitReaction(FName ResolvedBone);
 
 	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Combat")
 	void ReceiveBulletHit(const FHitResult& Impact, float BaseDamage);
@@ -68,19 +70,16 @@ protected:
 	TObjectPtr<UAnimMontage> HitRightArmMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TObjectPtr<UAnimMontage> DeathMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
 	TArray<FString> HeadBoneKeywords = { TEXT("head") };
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
-	TArray<FString> LeftArmBoneKeywords =
-	{
-		TEXT("clavicle_l"), TEXT("upperarm_l"), TEXT("lowerarm_l"), TEXT("hand_l")
-	};
+	TArray<FString> LeftArmBoneKeywords = { TEXT("clavicle_l"), TEXT("upperarm_l"), TEXT("lowerarm_l"), TEXT("hand_l") };
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
-	TArray<FString> RightArmBoneKeywords =
-	{
-		TEXT("clavicle_r"), TEXT("upperarm_r"), TEXT("lowerarm_r"), TEXT("hand_r")
-	};
+	TArray<FString> RightArmBoneKeywords = { TEXT("clavicle_r"), TEXT("upperarm_r"), TEXT("lowerarm_r"), TEXT("hand_r") };
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Health", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UHealthComponent> HealthComponent;
@@ -93,4 +92,6 @@ private:
 
 	UAnimMontage* SelectHitMontage(FName BoneName) const;
 	FName ResolveHitBone(const FHitResult& Impact) const;
+	void HandleDeath();
+	void EnterRagdoll();
 };

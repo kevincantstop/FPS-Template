@@ -1,5 +1,6 @@
 ﻿#include "Enemy/EnemyCharacter.h"
 
+#include "Components/CapsuleComponent.h"
 #include "Enemy/EnemyAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Health/HealthComponent.h"
@@ -36,6 +37,8 @@ AEnemyCharacter::AEnemyCharacter()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	HealthComponent->OnDeath.AddDynamic(this, &AEnemyCharacter::HandleDeath);
 	
 	ApplyRandomMesh();
 	
@@ -82,7 +85,7 @@ void AEnemyCharacter::ApplyRandomMesh()
 	MeshComp->SetSkeletalMeshAsset(Picked);
 }
 
-void AEnemyCharacter::PlayHitReaction(const FHitResult& Impact)
+void AEnemyCharacter::PlayHitReaction(FName ResolvedBone)
 {
 	USkeletalMeshComponent* SkelMesh = GetMesh();
 	if (!SkelMesh) { return; }
@@ -91,10 +94,8 @@ void AEnemyCharacter::PlayHitReaction(const FHitResult& Impact)
 	if (!Anim) { return; }
 	
 	if (Anim->IsAnyMontagePlaying()) { return; }
-	
-	const FName BoneName = ResolveHitBone(Impact);
 
-	UAnimMontage* Montage = SelectHitMontage(BoneName);
+	UAnimMontage* Montage = SelectHitMontage(ResolvedBone);
 	if (!Montage) { return; }
 
 	Anim->Montage_Play(Montage, 1.f);
@@ -126,7 +127,7 @@ void AEnemyCharacter::ReceiveBulletHit(const FHitResult& Impact, float BaseDamag
 	const FName BoneName = ResolveHitBone(Impact);
 	const bool bHeadshot = BoneMatchesAnyKeyword(BoneName.ToString().ToLower(), HeadBoneKeywords);
 
-	PlayHitReaction(Impact);
+	PlayHitReaction(BoneName);
 
 	const float FinalDamage = BaseDamage * (bHeadshot ? HeadshotMultiplier : 1.f);
 
@@ -137,4 +138,37 @@ void AEnemyCharacter::ReceiveBulletHit(const FHitResult& Impact, float BaseDamag
 
 	UE_LOG(LogTemp, Log, TEXT("[Enemy] bone=%s damage=%.1f%s"),
 		*BoneName.ToString(), FinalDamage, bHeadshot ? TEXT(" (HEADSHOT)") : TEXT(""));
+}
+
+void AEnemyCharacter::HandleDeath()
+{
+	if (AAIController* AI = Cast<AAIController>(GetController()))
+	{
+		AI->StopMovement();
+	}
+	
+	GetCharacterMovement()->DisableMovement();
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	if (UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr)
+	{
+		if (DeathMontage)
+		{
+			Anim->Montage_Play(DeathMontage, 1.f);
+		}
+	}
+	
+	FTimerHandle RagdollTimer;
+	GetWorldTimerManager().SetTimer(RagdollTimer, this, &AEnemyCharacter::EnterRagdoll, 2.f, false);
+}
+
+void AEnemyCharacter::EnterRagdoll()
+{
+	USkeletalMeshComponent* SkelMesh = GetMesh();
+	if (!SkelMesh) { return; }
+
+	SkelMesh->SetCollisionProfileName(TEXT("Ragdoll"));
+	SkelMesh->SetAllBodiesSimulatePhysics(true);
+	SkelMesh->WakeAllRigidBodies();
+	SkelMesh->bBlendPhysics = true;
 }
