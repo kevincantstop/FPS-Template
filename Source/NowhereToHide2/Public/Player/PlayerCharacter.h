@@ -47,6 +47,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
 	TObjectPtr<USoundBase> DeathSound;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TSubclassOf<UCameraShakeBase> HitCameraShake;
+
 	virtual bool CanJumpInternal_Implementation() const override;
 
 public:	

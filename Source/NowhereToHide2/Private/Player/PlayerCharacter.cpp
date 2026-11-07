@@ -67,6 +67,13 @@ void APlayerCharacter::HandleHealthChanged(float NewHealth, float DeltaHealth)
 	{
 		UGameplayStatics::SpawnSoundAttached(HitSound, GetMesh());
 	}
+	if (HitCameraShake)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			PC->ClientStartCameraShake(HitCameraShake);
+		}
+	}
 }
 
 bool APlayerCharacter::CanJumpInternal_Implementation() const
