@@ -92,6 +92,9 @@ private:
 
 	UAnimMontage* SelectHitMontage(FName BoneName) const;
 	FName ResolveHitBone(const FHitResult& Impact) const;
+
+	UFUNCTION()
 	void HandleDeath();
+	
 	void EnterRagdoll();
 };

@@ -150,16 +150,21 @@ void AEnemyCharacter::HandleDeath()
 	GetCharacterMovement()->DisableMovement();
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	if (UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr)
-	{
-		if (DeathMontage)
-		{
-			Anim->Montage_Play(DeathMontage, 1.f);
-		}
-	}
+	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
 	
-	FTimerHandle RagdollTimer;
-	GetWorldTimerManager().SetTimer(RagdollTimer, this, &AEnemyCharacter::EnterRagdoll, 2.f, false);
+	if (DeathMontage && Anim)
+	{
+		Anim->Montage_Play(DeathMontage, 1.f);
+		
+		FTimerHandle DeathAnimTimer;
+		GetWorldTimerManager().SetTimer(
+			DeathAnimTimer, this, &AEnemyCharacter::EnterRagdoll,
+			DeathMontage->GetPlayLength() * 0.8f, false);
+	}
+	else
+	{
+		EnterRagdoll();
+	}
 }
 
 void AEnemyCharacter::EnterRagdoll()
