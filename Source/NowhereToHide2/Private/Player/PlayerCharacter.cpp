@@ -70,6 +70,25 @@ void APlayerCharacter::HandleDeath()
 	{
 		UGameplayStatics::SpawnSound2D(this, DeathSound);
 	}
+
+	if (DeathMontage)
+	{
+		if (UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr)
+		{
+			Anim->Montage_Play(DeathMontage, 1.f);
+		}
+	}
+
+	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	{
+		Move->StopMovementImmediately();
+		Move->DisableMovement();
+	}
+
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		DisableInput(PC);
+	}
 }
 
 void APlayerCharacter::HandleHealthChanged(float NewHealth, float DeltaHealth)

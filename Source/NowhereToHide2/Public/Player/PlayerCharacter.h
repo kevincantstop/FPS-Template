@@ -50,6 +50,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
 	TSubclassOf<UCameraShakeBase> HitCameraShake;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Combat")
+	TObjectPtr<UAnimMontage> DeathMontage;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UPostProcessComponent> HitPostProcess;
