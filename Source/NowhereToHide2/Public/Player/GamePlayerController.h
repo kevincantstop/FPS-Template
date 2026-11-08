@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GamePlayerController.generated.h"
 
+class UHUDGameWidget;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
@@ -24,6 +25,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	virtual void AcknowledgePossession(APawn* P) override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -58,6 +60,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Audio", meta = (ClampMin = "0.0"))
 	float GameplayMusicFadeIn = 1.5f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|UI")
+	TSubclassOf<UHUDGameWidget> HUDWidgetClass;
+
 private:
 	void HandleLook(const FInputActionValue& Value);
 	void HandleMove(const FInputActionValue& Value);
@@ -76,6 +81,11 @@ private:
 
 	void HandleReload();
 
+	void CreateHUD();
+	
 	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent> GameplayMusicComponent;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UHUDGameWidget> HUDWidget;
 };

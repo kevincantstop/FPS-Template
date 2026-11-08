@@ -5,11 +5,13 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Blueprint/UserWidget.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/AudioComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacter.h"
+#include "UI/HUDGameWidget.h"
 
 AGamePlayerController::AGamePlayerController()
 {
@@ -75,6 +77,13 @@ void AGamePlayerController::SetupInputComponent()
 
 		EIC->BindAction(ReloadAction, ETriggerEvent::Started, this, &AGamePlayerController::HandleReload);
 	}
+}
+
+void AGamePlayerController::AcknowledgePossession(class APawn* P)
+{
+	Super::AcknowledgePossession(P);
+
+	CreateHUD();
 }
 
 void AGamePlayerController::HandleLook(const FInputActionValue& Value)
@@ -176,5 +185,16 @@ void AGamePlayerController::HandleReload()
 	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
 	{
 		C->Reload();
+	}
+}
+
+void AGamePlayerController::CreateHUD()
+{
+	if (!HUDWidgetClass || HUDWidget) { return; }
+
+	HUDWidget = CreateWidget<UHUDGameWidget>(this, HUDWidgetClass);
+	if (HUDWidget)
+	{
+		HUDWidget->AddToViewport();
 	}
 }
