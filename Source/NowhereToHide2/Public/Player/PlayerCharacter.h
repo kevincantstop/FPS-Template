@@ -67,7 +67,7 @@ protected:
 	float HitPostProcessFadeSpeed = 3.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Camera", meta = (ClampMin = "0.1"))
-	float DeathPostProcessFadeSpeed = 1.5f;
+	float DeathPostProcessFadeSpeed = 2.5f;
 
 	virtual bool CanJumpInternal_Implementation() const override;
 
