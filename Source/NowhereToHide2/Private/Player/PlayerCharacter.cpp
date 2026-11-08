@@ -89,6 +89,14 @@ void APlayerCharacter::HandleDeath()
 	{
 		DisableInput(PC);
 	}
+
+	if (USkeletalMeshComponent* SkelMesh = GetMesh())
+	{
+		if (SpringArm && SkelMesh->DoesSocketExist(TEXT("CameraSocket")))
+		{
+			SpringArm->AttachToComponent(SkelMesh, FAttachmentTransformRules::KeepWorldTransform, TEXT("CameraSocket"));
+		}
+	}
 }
 
 void APlayerCharacter::HandleHealthChanged(float NewHealth, float DeltaHealth)
