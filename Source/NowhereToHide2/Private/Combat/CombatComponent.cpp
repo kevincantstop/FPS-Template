@@ -60,6 +60,7 @@ void UCombatComponent::EquipWeapon(AWeapon* NewWeapon)
 	NewWeapon->SetOwner(OwnerCharacter);
 	NewWeapon->AttachToMesh(ArmsMesh, WeaponSocketName);
 	CurrentWeapon = NewWeapon;
+	OnCurrentWeaponChanged.Broadcast(CurrentWeapon);
 }
 
 AWeapon* UCombatComponent::GetCurrentWeapon() const
@@ -202,6 +203,7 @@ void UCombatComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		StopFire();
 		CurrentWeapon->Destroy();
 		CurrentWeapon = nullptr;
+		OnCurrentWeaponChanged.Broadcast(nullptr);
 	}
 
 	Super::EndPlay(EndPlayReason);

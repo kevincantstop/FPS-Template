@@ -6,6 +6,8 @@
 
 class ABullet;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAmmoChanged, int32, AmmoInClip, int32, ReserveAmmo);
+
 UCLASS()
 class NOWHERETOHIDE2_API AWeapon : public AActor
 {
@@ -31,6 +33,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Weapon")
 	void StartReload();
 	bool IsReloading() const { return bReloading; }
+
+	UPROPERTY(BlueprintAssignable, Category = "NowhereToHide|Weapon")
+	FOnAmmoChanged OnAmmoChanged;
+
+	void BroadcastAmmoChanged() { OnAmmoChanged.Broadcast(AmmoInClip, ReserveAmmo); }
 
 protected:
 	virtual void BeginPlay() override;

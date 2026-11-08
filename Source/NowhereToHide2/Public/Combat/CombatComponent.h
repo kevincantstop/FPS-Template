@@ -11,6 +11,8 @@ class AWeapon;
 class UCameraComponent;
 class APlayerCharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCurrentWeaponChanged, AWeapon*, NewWeapon);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class NOWHERETOHIDE2_API UCombatComponent : public UActorComponent
 {
@@ -24,6 +26,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Combat")
 	AWeapon* GetCurrentWeapon() const;
+
+	UPROPERTY(BlueprintAssignable, Category = "NowhereToHide|Combat")
+	FOnCurrentWeaponChanged OnCurrentWeaponChanged;
 
 protected:
 	virtual void BeginPlay() override;

@@ -49,6 +49,7 @@ void AWeapon::BeginPlay()
 	Super::BeginPlay();
 	
 	AmmoInClip = ClipSize;
+	BroadcastAmmoChanged();
 }
 
 void AWeapon::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -103,6 +104,7 @@ void AWeapon::FireOnce()
 		return;
 	}
 	--AmmoInClip;
+	BroadcastAmmoChanged();
 
 	FireBullet();
 
@@ -199,7 +201,7 @@ void AWeapon::FinishReload()
 	AmmoInClip  += Taken;
 	ReserveAmmo -= Taken;
 
-	UE_LOG(LogTemp, Log, TEXT("[Weapon] Reload finished. Clip=%d/%d Reserve=%d"), AmmoInClip, ClipSize, ReserveAmmo);
+	BroadcastAmmoChanged();
 }
 
 float AWeapon::GetReloadDuration() const
