@@ -6,7 +6,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Camera/PlayerCameraManager.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacter.h"
 
 AGamePlayerController::AGamePlayerController()
@@ -32,6 +34,15 @@ void AGamePlayerController::BeginPlay()
 			{
 				Subsystem->AddMappingContext(DefaultMappingContext, 0);
 			}
+		}
+	}
+
+	if (GameplayMusic)
+	{
+		GameplayMusicComponent = UGameplayStatics::SpawnSound2D(this, GameplayMusic, 0.f);
+		if (GameplayMusicComponent)
+		{
+			GameplayMusicComponent->FadeIn(GameplayMusicFadeIn, GameplayMusicVolume);
 		}
 	}
 }

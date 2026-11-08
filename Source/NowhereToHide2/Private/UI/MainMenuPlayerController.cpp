@@ -2,12 +2,18 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraActor.h"
+#include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/MainMenuWidget.h"
 
 void AMainMenuPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (MenuMusic)
+	{
+		MenuMusicComponent = UGameplayStatics::SpawnSound2D(this, MenuMusic, MenuMusicVolume);
+	}
 
 	UseRandomCamera();
 
@@ -55,4 +61,22 @@ void AMainMenuPlayerController::UseRandomCamera()
 	{
 		ClientStartCameraShake(CameraIdleShake, CameraIdleShakeScale);
 	}
+}
+
+void AMainMenuPlayerController::StopMenuMusic(float FadeOutTime)
+{
+	if (MenuMusicComponent && MenuMusicComponent->IsPlaying())
+	{
+		MenuMusicComponent->FadeOut(FadeOutTime, 0.f);
+	}
+}
+
+void AMainMenuPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (MenuMusicComponent)
+	{
+		MenuMusicComponent->FadeOut(0.5f, 0.f);
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
