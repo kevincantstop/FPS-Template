@@ -50,4 +50,9 @@ void AMainMenuPlayerController::UseRandomCamera()
 	AActor* Chosen = FoundCameras[FMath::RandRange(0, FoundCameras.Num() - 1)];
 	
 	SetViewTargetWithBlend(Chosen, bRotateCameras ? 2.f : 0.f);
+
+	if (CameraIdleShake)
+	{
+		ClientStartCameraShake(CameraIdleShake, CameraIdleShakeScale);
+	}
 }

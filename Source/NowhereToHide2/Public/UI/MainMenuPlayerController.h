@@ -30,6 +30,12 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|UI", meta = (EditCondition = "bRotateCameras", ClampMin = "3.0"))
 	float CameraRotateInterval = 12.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|UI")
+	TSubclassOf<UCameraShakeBase> CameraIdleShake;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|UI", meta = (ClampMin = "0.0"))
+	float CameraIdleShakeScale = 1.f;
 
 private:
 	UPROPERTY(Transient)
