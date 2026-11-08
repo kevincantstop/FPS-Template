@@ -1,5 +1,7 @@
 ﻿#include "Health/HealthComponent.h"
 
+#include "WorldPartition/HLOD/DestructibleHLODComponent.h"
+
 UHealthComponent::UHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -9,7 +11,7 @@ void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CurrentHealth = MaxHealth;
+	SetHealth(MaxHealth);
 	bIsDead = false;
 }
 
