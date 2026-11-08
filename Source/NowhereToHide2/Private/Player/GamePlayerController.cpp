@@ -20,6 +20,11 @@ void AGamePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetInputMode(FInputModeGameOnly());
+	bShowMouseCursor = false;
+	SetIgnoreMoveInput(false);
+	SetIgnoreLookInput(false);
+
 	if (PlayerCameraManager)
 	{
 		PlayerCameraManager->ViewPitchMin = -85.f;
@@ -39,10 +44,10 @@ void AGamePlayerController::BeginPlay()
 
 	if (GameplayMusic)
 	{
-		GameplayMusicComponent = UGameplayStatics::SpawnSound2D(this, GameplayMusic, 0.f);
+		GameplayMusicComponent = UGameplayStatics::SpawnSound2D(this, GameplayMusic, GameplayMusicVolume);
 		if (GameplayMusicComponent)
 		{
-			GameplayMusicComponent->FadeIn(GameplayMusicFadeIn, GameplayMusicVolume);
+			GameplayMusicComponent->FadeIn(GameplayMusicFadeIn, 1.f);
 		}
 	}
 }

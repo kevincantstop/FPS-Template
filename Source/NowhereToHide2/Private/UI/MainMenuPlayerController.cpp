@@ -78,5 +78,8 @@ void AMainMenuPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason
 		MenuMusicComponent->FadeOut(0.5f, 0.f);
 	}
 
+	bShowMouseCursor = false;
+	SetInputMode(FInputModeGameOnly());
+	
 	Super::EndPlay(EndPlayReason);
 }
