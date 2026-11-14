@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UInteractComponent;
 class UPostProcessComponent;
 class UHealthComponent;
 class URectLightComponent;
@@ -69,6 +70,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Camera", meta = (ClampMin = "0.1"))
 	float DeathPostProcessFadeSpeed = 2.5f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Interaction", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInteractComponent> InteractComponent;
+
 	virtual bool CanJumpInternal_Implementation() const override;
 
 public:	
@@ -109,6 +113,9 @@ public:
 
 	UFUNCTION()
 	void HandleHealthChanged(float NewHealth, float DeltaHealth);
+
+	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Interaction")
+	UInteractComponent* GetInteractComponent() const { return InteractComponent; }
 
 	UFUNCTION()
 	void HandleDeath();

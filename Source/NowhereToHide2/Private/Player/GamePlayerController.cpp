@@ -9,6 +9,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "Components/AudioComponent.h"
 #include "GameFramework/Character.h"
+#include "Interaction/InteractComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacter.h"
 #include "UI/HUDGameWidget.h"
@@ -76,6 +77,8 @@ void AGamePlayerController::SetupInputComponent()
 		EIC->BindAction(FireAction, ETriggerEvent::Completed, this, &AGamePlayerController::HandleFireStop);
 
 		EIC->BindAction(ReloadAction, ETriggerEvent::Started, this, &AGamePlayerController::HandleReload);
+
+		EIC->BindAction(InteractAction, ETriggerEvent::Started, this, &AGamePlayerController::HandleInteract);
 	}
 }
 
@@ -185,6 +188,17 @@ void AGamePlayerController::HandleReload()
 	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
 	{
 		C->Reload();
+	}
+}
+
+void AGamePlayerController::HandleInteract()
+{
+	if (const APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
+	{
+		if (UInteractComponent* Interact = C->GetInteractComponent())
+		{
+			Interact->TryInteract();
+		}
 	}
 }
 

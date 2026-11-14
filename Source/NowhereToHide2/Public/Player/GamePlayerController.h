@@ -53,6 +53,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Audio")
 	TObjectPtr<USoundBase> GameplayMusic;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
+	TObjectPtr<UInputAction> InteractAction;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Audio", meta = (ClampMin = "0.0", ClampMax = "2.0"))
 	float GameplayMusicVolume = 0.6f;
@@ -80,6 +83,8 @@ private:
 	void HandleFireStop();
 
 	void HandleReload();
+	
+	void HandleInteract();
 
 	void CreateHUD();
 	

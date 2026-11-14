@@ -11,6 +11,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Health/HealthComponent.h"
+#include "Interaction/InteractComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -35,6 +36,8 @@ APlayerCharacter::APlayerCharacter()
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+
+	InteractComponent = CreateDefaultSubobject<UInteractComponent>(TEXT("InteractComponent"));
 
 	HitPostProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("HitPostProcess"));
 	HitPostProcess->SetupAttachment(Camera);
@@ -96,6 +99,11 @@ void APlayerCharacter::HandleDeath()
 		{
 			SpringArm->AttachToComponent(SkelMesh, FAttachmentTransformRules::KeepWorldTransform, TEXT("CameraSocket"));
 		}
+	}
+
+	if (InteractComponent)
+	{
+		InteractComponent->SetComponentTickEnabled(false);
 	}
 }
 
