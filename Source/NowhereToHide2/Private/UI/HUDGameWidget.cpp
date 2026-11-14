@@ -5,6 +5,7 @@
 
 #include "Combat/CombatComponent.h"
 #include "Health/HealthComponent.h"
+#include "Interaction/InteractComponent.h"
 #include "Player/PlayerCharacter.h"
 #include "Weapon/Weapon.h"
 
@@ -49,6 +50,12 @@ void UHUDGameWidget::BindToPawn()
 	{
 		Combat->OnCurrentWeaponChanged.AddUniqueDynamic(this, &UHUDGameWidget::HandleCurrentWeaponChanged);
 		BindToWeapon(Combat->GetCurrentWeapon());
+	}
+
+	if (UInteractComponent* Interact = CachedPlayer->GetInteractComponent())
+	{
+		Interact->OnInteractionTargetChanged.AddUniqueDynamic(
+			this, &UHUDGameWidget::HandleInteractionTargetChanged);
 	}
 }
 
@@ -101,4 +108,14 @@ void UHUDGameWidget::HandleCurrentWeaponChanged(AWeapon* NewWeapon)
 {
 	BindToWeapon(NewWeapon);
 	RefreshAll();
+}
+
+void UHUDGameWidget::HandleInteractionTargetChanged()
+{
+	const UInteractComponent* Interact = CachedPlayer ? CachedPlayer->GetInteractComponent() : nullptr;
+	const bool bHasTarget = Interact && Interact->HasFocusedActor();
+
+	OnInteractionPromptChanged(
+		bHasTarget ? Interact->GetInteractionPrompt() : FText::GetEmpty(),
+		bHasTarget);
 }

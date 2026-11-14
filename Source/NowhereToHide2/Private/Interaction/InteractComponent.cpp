@@ -73,6 +73,7 @@ void UInteractComponent::UpdateInteractionTarget()
 
 void UInteractComponent::SetFocusedActor(AActor* NewActor)
 {
+	if (!IsValid(NewActor)) { NewActor = nullptr; }
 	if (FocusedActor == NewActor) { return; }
 
 	FocusedActor = NewActor;
@@ -87,7 +88,7 @@ void UInteractComponent::SetFocusedActor(AActor* NewActor)
 bool UInteractComponent::TryInteract()
 {
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
-	if (!FocusedActor || !OwnerPawn) { return false; }
+	if (!IsValid(FocusedActor) || !OwnerPawn) { return false; }
 
 	if (!IInteractable::Execute_CanInteract(FocusedActor, OwnerPawn)) { return false; }
 

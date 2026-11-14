@@ -31,6 +31,12 @@ protected:
 	UFUNCTION()
 	void HandleCurrentWeaponChanged(AWeapon* NewWeapon);
 
+	UFUNCTION()
+	void HandleInteractionTargetChanged();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "NowhereToHide|HUD")
+	void OnInteractionPromptChanged(const FText& PromptText, bool bVisible);
+
 private:
 	void BindToPawn();
 	void BindToWeapon(AWeapon* Weapon);
