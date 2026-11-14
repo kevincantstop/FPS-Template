@@ -10,8 +10,7 @@ class NOWHERETOHIDE2_API AHealthPickup : public AInteractableActor
 
 public:
 	AHealthPickup();
-
-	virtual bool CanInteract_Implementation(APawn* Interactor) const override;
+	
 	virtual void Interact_Implementation(APawn* Interactor) override;
 
 protected:
