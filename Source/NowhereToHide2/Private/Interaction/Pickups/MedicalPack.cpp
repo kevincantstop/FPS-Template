@@ -1,14 +1,16 @@
-﻿#include "Interaction/HealthPickup.h"
+#include "Interaction/Pickups/MedicalPack.h"
 
 #include "Health/HealthComponent.h"
 #include "Player/PlayerCharacter.h"
 
-AHealthPickup::AHealthPickup()
+AMedicalPack::AMedicalPack()
 {
 	bOneShot = true;
+
+	PromptText = FText::FromString(TEXT("[E] Pick up medkit"));
 }
 
-void AHealthPickup::Interact_Implementation(APawn* Interactor)
+void AMedicalPack::Interact_Implementation(APawn* Interactor)
 {
 	Super::Interact_Implementation(Interactor);
 
@@ -19,6 +21,9 @@ void AHealthPickup::Interact_Implementation(APawn* Interactor)
 			Health->Heal(HealAmount);
 		}
 	}
-	
-	Destroy();
+
+	if (bDestroyOnPickup)
+	{
+		Destroy();
+	}
 }
