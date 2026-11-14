@@ -44,6 +44,15 @@ void AWeapon::StartReload()
 	UE_LOG(LogTemp, Log, TEXT("[Weapon] Reloading for %.2fs (clip %d/%d, reserve %d)"), Duration, AmmoInClip, ClipSize, ReserveAmmo);
 }
 
+void AWeapon::AddReserveAmmo(int32 AmountOfAmmo)
+{
+	if (AmountOfAmmo <= 0) { return; }
+
+	ReserveAmmo += AmountOfAmmo;
+	
+	BroadcastAmmoChanged();
+}
+
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();

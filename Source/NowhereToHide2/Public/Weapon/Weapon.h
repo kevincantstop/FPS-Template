@@ -34,6 +34,9 @@ public:
 	void StartReload();
 	bool IsReloading() const { return bReloading; }
 
+	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Weapon")
+	void AddReserveAmmo(int32 AmountOfAmmo);
+
 	UPROPERTY(BlueprintAssignable, Category = "NowhereToHide|Weapon")
 	FOnAmmoChanged OnAmmoChanged;
 
