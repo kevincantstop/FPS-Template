@@ -42,9 +42,6 @@ protected:
 	bool bCanClose = true;
 
 	UPROPERTY(EditAnywhere, Category = "NowhereToHide|Door")
-	TObjectPtr<USoundBase> DoorSound;
-
-	UPROPERTY(EditAnywhere, Category = "NowhereToHide|Door")
 	FText OpenPrompt;
 
 	UPROPERTY(EditAnywhere, Category = "NowhereToHide|Door")

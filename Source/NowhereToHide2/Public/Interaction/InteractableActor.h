@@ -40,4 +40,16 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NowhereToHide|Interaction")
 	bool bOneShot = false;
+	
+	UPROPERTY(EditAnywhere, Category = "NowhereToHide|Interaction")
+	TObjectPtr<USoundBase> InteractSound;
+	
+	UPROPERTY(EditAnywhere, Category = "NowhereToHide|Interaction", meta = (ClampMin = "0.0"))
+	float InteractSoundVolume = 1.f;
+	
+	UPROPERTY(EditAnywhere, Category = "NowhereToHide|Interaction", meta = (ClampMin = "0.0"))
+	float InteractSoundPitchVariation = 0.05f;
+
+private:
+	void PlayInteractSound() const;
 };

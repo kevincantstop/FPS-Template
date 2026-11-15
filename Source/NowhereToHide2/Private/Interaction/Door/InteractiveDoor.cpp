@@ -1,7 +1,6 @@
 ﻿#include "Interaction/Door/InteractiveDoor.h"
 
 #include "Components/StaticMeshComponent.h"
-#include "Kismet/GameplayStatics.h"
 
 AInteractiveDoor::AInteractiveDoor()
 {
@@ -71,11 +70,6 @@ void AInteractiveDoor::StartSwing(bool bNewOpen)
 	}
 
 	SetActorTickEnabled(true);
-
-	if (DoorSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, DoorSound, GetActorLocation());
-	}
 }
 
 void AInteractiveDoor::Tick(float DeltaSeconds)

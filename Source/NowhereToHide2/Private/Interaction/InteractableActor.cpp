@@ -1,5 +1,6 @@
 ﻿#include "Interaction/InteractableActor.h"
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AInteractableActor::AInteractableActor()
 {
@@ -22,6 +23,8 @@ void AInteractableActor::Interact_Implementation(APawn* Interactor)
 
 	OnInteracted(Interactor);
 
+	PlayInteractSound();
+
 	if (bOneShot)
 	{
 		SetInteractable(false);
@@ -36,4 +39,15 @@ FText AInteractableActor::GetInteractionPrompt_Implementation() const
 void AInteractableActor::SetInteractable(bool bNewInteractable)
 {
 	bInteractable = bNewInteractable;
+}
+
+void AInteractableActor::PlayInteractSound() const
+{
+	if (!InteractSound) { return; }
+
+	const float MinPitch = 1.f - InteractSoundPitchVariation;
+	const float MaxPitch = 1.f + InteractSoundPitchVariation;
+	const float Pitch = FMath::FRandRange(MinPitch, MaxPitch);
+
+	UGameplayStatics::PlaySoundAtLocation(this, InteractSound, GetActorLocation(), InteractSoundVolume, Pitch);
 }
