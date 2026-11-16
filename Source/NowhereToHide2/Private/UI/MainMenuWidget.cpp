@@ -13,7 +13,7 @@ void UMainMenuWidget::StartGame()
 		return;
 	}
 
-	const FString CurrentLevel = UGameplayStatics::GetCurrentLevelName(this, /*bRemovePrefixString*/ true);
+	const FString CurrentLevel = UGameplayStatics::GetCurrentLevelName(this, true);
 	const FString Options = FString::Printf(TEXT("?game=%s"), *GameModePath);
 
 	UGameplayStatics::OpenLevel(this, FName(*CurrentLevel), true, Options);
