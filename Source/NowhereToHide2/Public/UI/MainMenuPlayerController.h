@@ -6,7 +6,6 @@
 #include "GameFramework/PlayerController.h"
 #include "MainMenuPlayerController.generated.h"
 
-class UMainMenuWidget;
 /**
  * 
  */
@@ -27,7 +26,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|UI")
-	TSubclassOf<UMainMenuWidget> MainMenuWidgetClass;
+	TSubclassOf<UUserWidget> MainMenuWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|UI")
 	bool bRotateCameras = false;
@@ -49,7 +48,7 @@ protected:
 
 private:
 	UPROPERTY(Transient)
-	TObjectPtr<UMainMenuWidget> MainMenuWidget;
+	TObjectPtr<UUserWidget> MainMenuWidget;
 
 	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent> MenuMusicComponent;

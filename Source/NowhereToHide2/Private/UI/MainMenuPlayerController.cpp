@@ -4,7 +4,6 @@
 #include "Camera/CameraActor.h"
 #include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "UI/MainMenuWidget.h"
 
 void AMainMenuPlayerController::BeginPlay()
 {
@@ -19,7 +18,7 @@ void AMainMenuPlayerController::BeginPlay()
 
 	if (!MainMenuWidgetClass) { return; }
 
-	MainMenuWidget = CreateWidget<UMainMenuWidget>(this, MainMenuWidgetClass);
+	MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
 	if (!MainMenuWidget) { return; }
 
 	MainMenuWidget->AddToViewport();
