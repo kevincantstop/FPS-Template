@@ -56,6 +56,8 @@ void UGamePlaySubsystem::SetGamePaused(bool bPaused)
 	UGameplayStatics::SetGamePaused(World, bPaused);
 
 	ApplyPauseInputMode(bPaused);
+
+	OnGamePausedChanged.Broadcast(bPaused);
 }
 
 void UGamePlaySubsystem::TogglePause()

@@ -24,6 +24,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void SetupInputComponent() override;
 	virtual void AcknowledgePossession(APawn* P) override;
 
@@ -71,6 +72,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|UI")
 	TSubclassOf<UHUDGameWidget> HUDWidgetClass;
+
+	UFUNCTION()
+	void HandleGamePausedChanged(bool bPaused);
 
 private:
 	void HandleLook(const FInputActionValue& Value);

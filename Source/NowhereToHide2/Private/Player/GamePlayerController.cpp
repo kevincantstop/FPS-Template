@@ -55,6 +55,31 @@ void AGamePlayerController::BeginPlay()
 			GameplayMusicComponent->FadeIn(GameplayMusicFadeIn, 1.f);
 		}
 	}
+
+	if (UGamePlaySubsystem* Flow = GetGameInstance()->GetSubsystem<UGamePlaySubsystem>())
+	{
+		Flow->OnGamePausedChanged.AddUniqueDynamic(this, &AGamePlayerController::HandleGamePausedChanged);
+	}
+}
+
+void AGamePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (UGamePlaySubsystem* Flow = GetGameInstance() ? GetGameInstance()->GetSubsystem<UGamePlaySubsystem>() : nullptr)
+	{
+		Flow->OnGamePausedChanged.RemoveDynamic(this, &AGamePlayerController::HandleGamePausedChanged);
+		
+		if (Flow->IsGamePaused())
+		{
+			Flow->SetGamePaused(false);
+		}
+	}
+	
+	Super::EndPlay(EndPlayReason);
+}
+
+void AGamePlayerController::HandleGamePausedChanged(bool bPaused)
+{
+	ShowPauseMenu(bPaused);
 }
 
 void AGamePlayerController::SetupInputComponent()
@@ -86,7 +111,7 @@ void AGamePlayerController::SetupInputComponent()
 	}
 }
 
-void AGamePlayerController::AcknowledgePossession(class APawn* P)
+void AGamePlayerController::AcknowledgePossession(APawn* P)
 {
 	Super::AcknowledgePossession(P);
 
@@ -219,13 +244,10 @@ void AGamePlayerController::CreateHUD()
 
 void AGamePlayerController::HandlePause()
 {
-	UGamePlaySubsystem* Flow = GetGameInstance()->GetSubsystem<UGamePlaySubsystem>();
-	if (!Flow) { return; }
-
-	const bool bWillPause = !Flow->IsGamePaused();
-
-	Flow->SetGamePaused(bWillPause);
-	ShowPauseMenu(bWillPause);
+	if (UGamePlaySubsystem* Flow = GetGameInstance()->GetSubsystem<UGamePlaySubsystem>())
+	{
+		Flow->TogglePause();
+	}
 }
 
 void AGamePlayerController::ShowPauseMenu(bool bShow)

@@ -6,6 +6,8 @@
 
 class AGameModeBase;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGamePausedChanged, bool, bPaused);
+
 UCLASS(Config = Game)
 class NOWHERETOHIDE2_API UGamePlaySubsystem : public UGameInstanceSubsystem
 {
@@ -30,6 +32,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Flow")
 	bool IsGamePaused() const;
 
+	UPROPERTY(BlueprintAssignable, Category = "NowhereToHide|Flow")
+	FOnGamePausedChanged OnGamePausedChanged;
+	
 protected:
 	UPROPERTY(Config, EditAnywhere, Category = "Flow")
 	FSoftClassPath DefaultGameplayGameMode;
