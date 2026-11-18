@@ -32,6 +32,9 @@ protected:
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
+	TObjectPtr<UInputMappingContext> PauseMappingContext;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
 	TObjectPtr<UInputAction> LookAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
@@ -100,6 +103,9 @@ private:
 
 	void HandlePause();
 	void ShowPauseMenu(bool bShow);
+
+	bool IsGameInputAllowed() const;
+	void SwapInputMappingContext(bool bPaused);
 
 	UPROPERTY(Transient)
 	TObjectPtr<UUserWidget> PauseMenuWidget;

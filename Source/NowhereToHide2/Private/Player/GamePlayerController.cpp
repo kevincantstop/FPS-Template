@@ -80,6 +80,7 @@ void AGamePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AGamePlayerController::HandleGamePausedChanged(bool bPaused)
 {
 	ShowPauseMenu(bPaused);
+	SwapInputMappingContext(bPaused);
 }
 
 void AGamePlayerController::SetupInputComponent()
@@ -120,6 +121,8 @@ void AGamePlayerController::AcknowledgePossession(APawn* P)
 
 void AGamePlayerController::HandleLook(const FInputActionValue& Value)
 {
+	if (!IsGameInputAllowed()) { return; }
+	
 	const FVector2D Axis = Value.Get<FVector2D>();
 	AddYawInput(Axis.X);
 	AddPitchInput(-Axis.Y);
@@ -132,6 +135,8 @@ void AGamePlayerController::HandleLook(const FInputActionValue& Value)
 
 void AGamePlayerController::HandleMove(const FInputActionValue& Value)
 {
+	if (!IsGameInputAllowed()) { return; }
+	
 	APawn* P = GetPawn();
 	if (!P) { return; }
 
@@ -147,6 +152,8 @@ void AGamePlayerController::HandleMove(const FInputActionValue& Value)
 
 void AGamePlayerController::HandleJumpStart()
 {
+	if (!IsGameInputAllowed()) { return; }
+	
 	if (ACharacter* C = Cast<ACharacter>(GetPawn()))
 	{
 		if (C->CanJump())
@@ -166,6 +173,8 @@ void AGamePlayerController::HandleJumpStop()
 
 void AGamePlayerController::HandleSprintStart()
 {
+	if (!IsGameInputAllowed()) { return; }
+	
 	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
 	{
 		C->SetSprinting(true);
@@ -182,6 +191,8 @@ void AGamePlayerController::HandleSprintStop()
 
 void AGamePlayerController::HandleAimStart()
 {
+	if (!IsGameInputAllowed()) { return; }
+	
 	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
 	{
 		C->SetAiming(true);
@@ -198,6 +209,8 @@ void AGamePlayerController::HandleAimStop()
 
 void AGamePlayerController::HandleFireStart()
 {
+	if (!IsGameInputAllowed()) { return; }
+	
 	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
 	{
 		C->StartFire();
@@ -214,6 +227,8 @@ void AGamePlayerController::HandleFireStop()
 
 void AGamePlayerController::HandleReload()
 {
+	if (!IsGameInputAllowed()) { return; }
+	
 	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
 	{
 		C->Reload();
@@ -222,6 +237,8 @@ void AGamePlayerController::HandleReload()
 
 void AGamePlayerController::HandleInteract()
 {
+	if (!IsGameInputAllowed()) { return; }
+	
 	if (const APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
 	{
 		if (UInteractComponent* Interact = C->GetInteractComponent())
@@ -247,6 +264,45 @@ void AGamePlayerController::HandlePause()
 	if (UGamePlaySubsystem* Flow = GetGameInstance()->GetSubsystem<UGamePlaySubsystem>())
 	{
 		Flow->TogglePause();
+	}
+}
+
+bool AGamePlayerController::IsGameInputAllowed() const
+{
+	const UWorld* World = GetWorld();
+	return World && !UGameplayStatics::IsGamePaused(World);
+}
+
+void AGamePlayerController::SwapInputMappingContext(bool bPaused)
+{
+	ULocalPlayer* LP = GetLocalPlayer();
+	if (!LP) { return; }
+
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	if (!Subsystem) { return; }
+
+	if (bPaused)
+	{
+		if (DefaultMappingContext)
+		{
+			Subsystem->RemoveMappingContext(DefaultMappingContext);
+		}
+		if (PauseMappingContext)
+		{
+			Subsystem->AddMappingContext(PauseMappingContext, 0);
+		}
+	}
+	else
+	{
+		if (PauseMappingContext)
+		{
+			Subsystem->RemoveMappingContext(PauseMappingContext);
+		}
+
+		if (DefaultMappingContext)
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
 	}
 }
 
