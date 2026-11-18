@@ -56,6 +56,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
 	TObjectPtr<UInputAction> InteractAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
+	TObjectPtr<UInputAction> PauseAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|UI")
+	TSubclassOf<UUserWidget> PauseMenuClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Audio", meta = (ClampMin = "0.0", ClampMax = "2.0"))
 	float GameplayMusicVolume = 0.6f;
@@ -87,6 +93,12 @@ private:
 	void HandleInteract();
 
 	void CreateHUD();
+
+	void HandlePause();
+	void ShowPauseMenu(bool bShow);
+
+	UPROPERTY(Transient)
+	TObjectPtr<UUserWidget> PauseMenuWidget;
 	
 	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent> GameplayMusicComponent;

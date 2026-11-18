@@ -3,6 +3,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "GameFramework/PlayerController.h"
 
 void UGamePlaySubsystem::StartGame(TSubclassOf<AGameModeBase> GameModeOverride)
 {
@@ -45,4 +46,49 @@ void UGamePlaySubsystem::ReloadCurrentLevelWithGameMode(const FString& GameModeP
 		: FString::Printf(TEXT("?game=%s"), *GameModePath);
 
 	UGameplayStatics::OpenLevel(World, FName(*LevelName), true, Options);
+}
+
+void UGamePlaySubsystem::SetGamePaused(bool bPaused)
+{
+	UWorld* World = GetWorld();
+	if (!World) { return; }
+
+	UGameplayStatics::SetGamePaused(World, bPaused);
+
+	ApplyPauseInputMode(bPaused);
+}
+
+void UGamePlaySubsystem::TogglePause()
+{
+	SetGamePaused(!IsGamePaused());
+}
+
+bool UGamePlaySubsystem::IsGamePaused() const
+{
+	const UWorld* World = GetWorld();
+	return World && UGameplayStatics::IsGamePaused(World);
+}
+
+void UGamePlaySubsystem::ApplyPauseInputMode(bool bPaused)
+{
+	APlayerController* PC = GetGameInstance()
+		? GetGameInstance()->GetFirstLocalPlayerController()
+		: nullptr;
+
+	if (!PC) { return; }
+
+	if (bPaused)
+	{
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+
+		PC->SetInputMode(InputMode);
+		PC->bShowMouseCursor = true;
+	}
+	else
+	{
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->bShowMouseCursor = false;
+	}
 }

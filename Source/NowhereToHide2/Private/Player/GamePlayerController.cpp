@@ -8,6 +8,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/AudioComponent.h"
+#include "Game/GamePlaySubsystem.h"
 #include "GameFramework/Character.h"
 #include "Interaction/InteractComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -17,6 +18,7 @@
 AGamePlayerController::AGamePlayerController()
 {
 	bShowMouseCursor = false;
+	bShouldPerformFullTickWhenPaused = true;
 }
 
 void AGamePlayerController::BeginPlay()
@@ -79,6 +81,8 @@ void AGamePlayerController::SetupInputComponent()
 		EIC->BindAction(ReloadAction, ETriggerEvent::Started, this, &AGamePlayerController::HandleReload);
 
 		EIC->BindAction(InteractAction, ETriggerEvent::Started, this, &AGamePlayerController::HandleInteract);
+		
+		EIC->BindAction(PauseAction, ETriggerEvent::Started, this, &AGamePlayerController::HandlePause);
 	}
 }
 
@@ -210,5 +214,36 @@ void AGamePlayerController::CreateHUD()
 	if (HUDWidget)
 	{
 		HUDWidget->AddToViewport();
+	}
+}
+
+void AGamePlayerController::HandlePause()
+{
+	UGamePlaySubsystem* Flow = GetGameInstance()->GetSubsystem<UGamePlaySubsystem>();
+	if (!Flow) { return; }
+
+	const bool bWillPause = !Flow->IsGamePaused();
+
+	Flow->SetGamePaused(bWillPause);
+	ShowPauseMenu(bWillPause);
+}
+
+void AGamePlayerController::ShowPauseMenu(bool bShow)
+{
+	if (bShow)
+	{
+		if (!PauseMenuWidget && PauseMenuClass)
+		{
+			PauseMenuWidget = CreateWidget<UUserWidget>(this, PauseMenuClass);
+		}
+
+		if (PauseMenuWidget)
+		{
+			PauseMenuWidget->AddToViewport(10);
+		}
+	}
+	else if (PauseMenuWidget)
+	{
+		PauseMenuWidget->RemoveFromParent();
 	}
 }
