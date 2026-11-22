@@ -48,21 +48,20 @@ void UGamePlaySubsystem::ReloadCurrentLevelWithGameMode(const FString& GameModeP
 	UGameplayStatics::OpenLevel(World, FName(*LevelName), true, Options);
 }
 
-void UGamePlaySubsystem::SetGamePaused(bool bPaused)
+void UGamePlaySubsystem::SetGamePaused(bool bPaused, bool bShowPauseMenu)
 {
 	UWorld* World = GetWorld();
 	if (!World) { return; }
 
 	UGameplayStatics::SetGamePaused(World, bPaused);
-
 	ApplyPauseInputMode(bPaused);
 
-	OnGamePausedChanged.Broadcast(bPaused);
+	OnGamePausedChanged.Broadcast(bPaused, bShowPauseMenu);
 }
 
 void UGamePlaySubsystem::TogglePause()
 {
-	SetGamePaused(!IsGamePaused());
+	SetGamePaused(!IsGamePaused(), true);
 }
 
 bool UGamePlaySubsystem::IsGamePaused() const

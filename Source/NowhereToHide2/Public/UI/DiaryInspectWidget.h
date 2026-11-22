@@ -68,9 +68,6 @@ private:
 	UPROPERTY(Transient)
 	TObjectPtr<AInspectMeshActor> PreviewActor;
 
-	UPROPERTY(Transient)
-	TObjectPtr<UDiaryData> CurrentDiary;
-
 	bool bAutoRotate = false;
 	bool bIsDragging = false;
 	float CaptureAccumulator = 0.f;

@@ -6,7 +6,7 @@
 
 class AGameModeBase;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGamePausedChanged, bool, bPaused);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGamePausedChanged, bool, bPaused, bool, bShowPauseMenu);
 
 UCLASS(Config = Game)
 class NOWHERETOHIDE2_API UGamePlaySubsystem : public UGameInstanceSubsystem
@@ -24,7 +24,7 @@ public:
 	void ReturnToMainMenu();
 
 	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Flow")
-	void SetGamePaused(bool bPaused);
+	void SetGamePaused(bool bPaused, bool bShowPauseMenu = true);
 	
 	UFUNCTION(BlueprintCallable, Category = "NowhereToHide|Flow")
 	void TogglePause();

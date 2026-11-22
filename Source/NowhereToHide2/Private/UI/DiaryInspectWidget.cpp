@@ -78,7 +78,7 @@ void UDiaryInspectWidget::CloseDiary()
 {
 	if (UGamePlaySubsystem* Flow = GetGameInstance() ? GetGameInstance()->GetSubsystem<UGamePlaySubsystem>() : nullptr)
 	{
-		Flow->SetGamePaused(false);
+		Flow->SetGamePaused(false, false);
 	}
 
 	RemoveFromParent();

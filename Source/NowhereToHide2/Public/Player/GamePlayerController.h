@@ -77,7 +77,7 @@ protected:
 	TSubclassOf<UHUDGameWidget> HUDWidgetClass;
 
 	UFUNCTION()
-	void HandleGamePausedChanged(bool bPaused);
+	void HandleGamePausedChanged(bool bPaused, bool bShowPauseMenu);
 
 private:
 	void HandleLook(const FInputActionValue& Value);

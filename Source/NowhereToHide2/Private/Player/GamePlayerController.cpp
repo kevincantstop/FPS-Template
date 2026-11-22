@@ -77,9 +77,9 @@ void AGamePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void AGamePlayerController::HandleGamePausedChanged(bool bPaused)
+void AGamePlayerController::HandleGamePausedChanged(bool bPaused, bool bShowPauseMenu)
 {
-	ShowPauseMenu(bPaused);
+	ShowPauseMenu(bPaused && bShowPauseMenu);
 	SwapInputMappingContext(bPaused);
 }
 
