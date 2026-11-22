@@ -7,7 +7,7 @@ AMedicalPack::AMedicalPack()
 {
 	bOneShot = true;
 
-	PromptText = FText::FromString(TEXT("[E] Pick up medkit"));
+	PromptText = FText::FromString(TEXT("Pick up medkit"));
 }
 
 void AMedicalPack::Interact_Implementation(APawn* Interactor)

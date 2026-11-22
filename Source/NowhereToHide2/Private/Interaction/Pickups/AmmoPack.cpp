@@ -8,7 +8,7 @@ AAmmoPack::AAmmoPack()
 {
 	bOneShot = true;
 
-	PromptText = FText::FromString(TEXT("[E] Pick up ammo"));
+	PromptText = FText::FromString(TEXT("Pick up ammo"));
 }
 
 void AAmmoPack::Interact_Implementation(APawn* Interactor)

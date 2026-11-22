@@ -16,8 +16,8 @@ AInteractiveDoor::AInteractiveDoor()
 	DoorPanel->SetupAttachment(Hinge);
 	DoorPanel->SetCollisionProfileName(TEXT("BlockAll"));
 
-	OpenPrompt  = FText::FromString(TEXT("[E] Open door"));
-	ClosePrompt = FText::FromString(TEXT("[E] Close door"));
+	OpenPrompt  = FText::FromString(TEXT("Open door"));
+	ClosePrompt = FText::FromString(TEXT("Close door"));
 }
 
 void AInteractiveDoor::BeginPlay()
