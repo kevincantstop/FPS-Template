@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
@@ -66,9 +66,26 @@ protected:
 	bool bPausePlayerAnimations = true;
 
 private:
-	void CreateRuntimeCamera();
-	void DestroyRuntimeCamera();
-	void FocusOnItem(AInspectItem* Item);
+	ACharacter*        GetOwnerCharacter() const;
+	APlayerController* GetOwnerPC() const;
+
+	void  CreateRuntimeCamera();
+	void  DestroyRuntimeCamera();
+
+	void  AlignCameraToPlayerView();
+
+	float CalculateInspectionDistance(const AInspectItem* Item) const;
+
+	void  FocusOnItem(AInspectItem* Item);
+	void  SwitchToInspectionCamera(bool bInspect);
+
+	void SetPlayerFrozen(bool bFrozen);
+	void ApplyInspectionInputMode(bool bInspect);
+
+	void CreateInspectionWidget(AInspectItem* Item);
+	void RemoveInspectionWidget();
+
+	void FinishEndInspect();
 	
 	UPROPERTY(Transient)
 	TObjectPtr<UCameraComponent> PlayerCamera;

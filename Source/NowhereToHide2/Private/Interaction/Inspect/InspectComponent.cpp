@@ -30,6 +30,17 @@ void UInspectComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+ACharacter* UInspectComponent::GetOwnerCharacter() const
+{
+	return Cast<ACharacter>(GetOwner());
+}
+
+APlayerController* UInspectComponent::GetOwnerPC() const
+{
+	const ACharacter* Character = GetOwnerCharacter();
+	return Character ? Cast<APlayerController>(Character->GetController()) : nullptr;
+}
+
 void UInspectComponent::CreateRuntimeCamera()
 {
 	AActor* Owner = GetOwner();
@@ -42,11 +53,11 @@ void UInspectComponent::CreateRuntimeCamera()
 	InspectionCamera->AttachToComponent(
 		Owner->GetRootComponent(),
 		FAttachmentTransformRules::KeepRelativeTransform);
-
+	
 	InspectionCamera->SetConstraintAspectRatio(false);
-	
+
 	InspectionCamera->SetActive(false);
-	
+
 	InspectionSlot = NewObject<USceneComponent>(Owner, TEXT("InspectionSlot"));
 	if (InspectionSlot)
 	{
@@ -55,7 +66,7 @@ void UInspectComponent::CreateRuntimeCamera()
 			InspectionCamera, FAttachmentTransformRules::KeepRelativeTransform);
 		InspectionSlot->SetRelativeLocation(FVector(ItemDistance, 0.f, 0.f));
 	}
-	
+
 	if (const ACharacter* Character = Cast<ACharacter>(Owner))
 	{
 		PlayerCamera = Character->FindComponentByClass<UCameraComponent>();
@@ -69,6 +80,7 @@ void UInspectComponent::DestroyRuntimeCamera()
 		InspectionSlot->DestroyComponent();
 		InspectionSlot = nullptr;
 	}
+
 	if (InspectionCamera)
 	{
 		InspectionCamera->DestroyComponent();
@@ -76,105 +88,63 @@ void UInspectComponent::DestroyRuntimeCamera()
 	}
 }
 
-bool UInspectComponent::BeginInspect(AInspectItem* Item)
+void UInspectComponent::AlignCameraToPlayerView()
 {
-	if (!Item || IsInspecting()) { return false; }
-	if (!InspectionCamera || !InspectionSlot) { return false; }
-
-	ACharacter* Character = Cast<ACharacter>(GetOwner());
-	APlayerController* PC = Character ? Cast<APlayerController>(Character->GetController()) : nullptr;
-	UWorld* World = GetWorld();
-
-	if (!Character || !PC || !World) { return false; }
+	APlayerController* PC = GetOwnerPC();
+	if (!PC || !InspectionCamera) { return; }
 	
 	FVector  ViewLoc;
 	FRotator ViewRot;
 	PC->GetPlayerViewPoint(ViewLoc, ViewRot);
 
 	InspectionCamera->SetWorldLocationAndRotation(ViewLoc, ViewRot);
-	
+
 	if (PlayerCamera && PC->PlayerCameraManager)
 	{
 		InspectionCamera->SetFieldOfView(PC->PlayerCameraManager->GetFOVAngle());
 	}
-	
+
 	CurrentFocalLength = FMath::Clamp(CurrentFocalLength, MinFocalLength, MaxFocalLength);
 	InspectionCamera->CurrentFocalLength = CurrentFocalLength;
-	
-	const float DesiredDistance =
-		Item->GetInspectDistance() > 0.f ? Item->GetInspectDistance() : ItemDistance;
+}
+
+float UInspectComponent::CalculateInspectionDistance(const AInspectItem* Item) const
+{
+	const float DesiredDistance = (Item && Item->GetInspectDistance() > 0.f)
+		? Item->GetInspectDistance()
+		: ItemDistance;
 
 	float Distance = FMath::Max(DesiredDistance, MinDistance);
 	
-	{
-		const FVector CamLoc = InspectionCamera->GetComponentLocation();
-		const FVector CamFwd = InspectionCamera->GetForwardVector();
-		const FVector EndLoc = CamLoc + CamFwd * Distance;
+	const UWorld* World = GetWorld();
+	if (!World || !InspectionCamera) { return Distance; }
 
-		FCollisionQueryParams Params(SCENE_QUERY_STAT(InspectOcclusion), false, Character);
-		Params.AddIgnoredActor(Character);
-		Params.AddIgnoredActor(Item);
+	const FVector Start = InspectionCamera->GetComponentLocation();
+	const FVector End   = Start + InspectionCamera->GetForwardVector() * Distance;
 
-		FHitResult Hit;
-		const bool bBlocked = World->SweepSingleByChannel(
-			Hit, CamLoc, EndLoc, FQuat::Identity,
-			ECC_Visibility,
-			FCollisionShape::MakeSphere(FMath::Max(ItemClearance, 1.f)),
-			Params);
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(InspectOcclusion), false, GetOwner());
+	Params.AddIgnoredActor(GetOwner());
+	if (Item) { Params.AddIgnoredActor(Item); }
 
-		if (bBlocked)
-		{
-			Distance = FMath::Max(Hit.Distance - ItemClearance, MinDistance);
-		}
-	}
-	
-	InspectionSlot->SetRelativeLocation(FVector(Distance, 0.f, 0.f));
-	
-	FocusOnItem(Item);
-	
-	if (PlayerCamera)
+	FHitResult Hit;
+	const bool bBlocked = World->SweepSingleByChannel(
+		Hit, Start, End, FQuat::Identity,
+		ECC_Visibility,
+		FCollisionShape::MakeSphere(FMath::Max(ItemClearance, 1.f)),
+		Params);
+
+	if (bBlocked)
 	{
-		PlayerCamera->SetActive(false);
-	}
-	InspectionCamera->SetActive(true);
-	
-	if (UCharacterMovementComponent* Move = Character->GetCharacterMovement())
-	{
-		Move->StopMovementImmediately();
-		Move->DisableMovement();
+		Distance = FMath::Max(Hit.Distance - ItemClearance, MinDistance);
 	}
 
-	if (bPausePlayerAnimations && Character->GetMesh())
-	{
-		Character->GetMesh()->bPauseAnims = true;
-	}
-	
-	InspectingItem = Item;
-	Item->BeginInspect(InspectionSlot->GetComponentTransform());
-	
-	if (TSubclassOf<UUserWidget> WidgetClass = Item->GetInspectWidgetClass())
-	{
-		InspectWidget = CreateWidget<UUserWidget>(PC, WidgetClass);
-		if (InspectWidget)
-		{
-			InspectWidget->AddToViewport(15);
-		}
-	}
-	
-	FInputModeGameAndUI InputMode;
-	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	InputMode.SetHideCursorDuringCapture(false);
-
-	PC->SetInputMode(InputMode);
-	PC->bShowMouseCursor = true;
-
-	return true;
+	return Distance;
 }
 
 void UInspectComponent::FocusOnItem(AInspectItem* Item)
 {
 	if (!InspectionCamera) { return; }
-	
+
 	FCameraFocusSettings Focus;
 	Focus.FocusMethod = ECameraFocusMethod::Tracking;
 	Focus.TrackingFocusSettings.ActorToTrack = Item;
@@ -183,54 +153,148 @@ void UInspectComponent::FocusOnItem(AInspectItem* Item)
 	InspectionCamera->FocusSettings = Focus;
 }
 
-void UInspectComponent::EndInspect()
+void UInspectComponent::SwitchToInspectionCamera(bool bInspect)
 {
-	if (!IsInspecting()) { return; }
+	if (!InspectionCamera) { return; }
 
-	ACharacter* Character = Cast<ACharacter>(GetOwner());
-	APlayerController* PC = Character ? Cast<APlayerController>(Character->GetController()) : nullptr;
-	
-	AInspectItem* Item = InspectingItem;
-	InspectingItem = nullptr;
+	if (bInspect)
+	{
+		if (PlayerCamera) { PlayerCamera->SetActive(false); }
+		InspectionCamera->SetActive(true);
+	}
+	else
+	{
+		InspectionCamera->SetActive(false);
+		if (PlayerCamera) { PlayerCamera->SetActive(true); }
+	}
+}
 
-	const float ReturnDelay = Item ? Item->BeginReturn() : 0.f;
+void UInspectComponent::SetPlayerFrozen(bool bFrozen)
+{
+	ACharacter* Character = GetOwnerCharacter();
+	if (!Character) { return; }
 
-	if (Item) { Item->EndInspect(); }
-	
+	if (UCharacterMovementComponent* Move = Character->GetCharacterMovement())
+	{
+		if (bFrozen)
+		{
+			Move->StopMovementImmediately();
+			Move->DisableMovement();
+		}
+		else
+		{
+			Move->SetMovementMode(MOVE_Walking);
+		}
+	}
+
+	if (bPausePlayerAnimations && Character->GetMesh())
+	{
+		Character->GetMesh()->bPauseAnims = bFrozen;
+	}
+}
+
+void UInspectComponent::ApplyInspectionInputMode(bool bInspect)
+{
+	APlayerController* PC = GetOwnerPC();
+	if (!PC) { return; }
+
+	if (bInspect)
+	{
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+
+		PC->SetInputMode(InputMode);
+		PC->bShowMouseCursor = true;
+	}
+	else
+	{
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->bShowMouseCursor = false;
+	}
+}
+
+void UInspectComponent::CreateInspectionWidget(AInspectItem* Item)
+{
+	APlayerController* PC = GetOwnerPC();
+	if (!PC || !Item) { return; }
+
+	const TSubclassOf<UUserWidget> WidgetClass = Item->GetInspectWidgetClass();
+	if (!WidgetClass) { return; }
+
+	InspectWidget = CreateWidget<UUserWidget>(PC, WidgetClass);
+	if (InspectWidget)
+	{
+		InspectWidget->AddToViewport(15);
+	}
+}
+
+void UInspectComponent::RemoveInspectionWidget()
+{
 	if (InspectWidget)
 	{
 		InspectWidget->RemoveFromParent();
 		InspectWidget = nullptr;
 	}
+}
+
+bool UInspectComponent::BeginInspect(AInspectItem* Item)
+{
+	if (!Item || IsInspecting()) { return false; }
+	if (!InspectionCamera || !InspectionSlot) { return false; }
+	if (!GetOwnerCharacter() || !GetOwnerPC() || !GetWorld()) { return false; }
+
+	InspectingItem = Item;
 	
-	if (UWorld* World = GetWorld())
+	AlignCameraToPlayerView();
+	FocusOnItem(Item);
+
+	const float Distance = CalculateInspectionDistance(Item);
+	InspectionSlot->SetRelativeLocation(FVector(Distance, 0.f, 0.f));
+	
+	SwitchToInspectionCamera(true);
+	SetPlayerFrozen(true);
+	
+	Item->BeginInspect(InspectionSlot->GetComponentTransform());
+	
+	CreateInspectionWidget(Item);
+	ApplyInspectionInputMode(true);
+
+	return true;
+}
+
+void UInspectComponent::EndInspect()
+{
+	if (!IsInspecting()) { return; }
+
+	AInspectItem* Item = InspectingItem;
+	InspectingItem = nullptr;
+	
+	const float ReturnDelay = Item ? Item->BeginReturn() : 0.f;
+	if (Item) { Item->EndInspect(); }
+
+	RemoveInspectionWidget();
+	
+	UWorld* World = GetWorld();
+	if (!World)
 	{
-		FTimerHandle Handle;
-		World->GetTimerManager().SetTimer(Handle,
-			FTimerDelegate::CreateWeakLambda(this, [this, Character, PC]()
-		{
-			if (InspectionCamera) { InspectionCamera->SetActive(false); }
-			if (PlayerCamera)     { PlayerCamera->SetActive(true); }
-
-			if (Character)
-			{
-				if (UCharacterMovementComponent* Move = Character->GetCharacterMovement())
-				{
-					Move->SetMovementMode(MOVE_Walking);
-				}
-				if (Character->GetMesh())
-				{
-					Character->GetMesh()->bPauseAnims = false;
-				}
-			}
-
-			if (PC)
-			{
-				PC->SetInputMode(FInputModeGameOnly());
-				PC->bShowMouseCursor = false;
-			}
-		}), FMath::Max(ReturnDelay, 0.05f), false);
+		FinishEndInspect();
+		return;
 	}
+
+	FTimerHandle Handle;
+	World->GetTimerManager().SetTimer(
+		Handle,
+		FTimerDelegate::CreateWeakLambda(this, [this]() { FinishEndInspect(); }),
+		FMath::Max(ReturnDelay, 0.05f),
+		false);
+}
+
+void UInspectComponent::FinishEndInspect()
+{
+	SwitchToInspectionCamera(false);
+	SetPlayerFrozen(false);
+	ApplyInspectionInputMode(false);
 }
 
 void UInspectComponent::AddInspectRotation(const FVector2D& Delta)
@@ -243,7 +307,7 @@ void UInspectComponent::AddInspectRotation(const FVector2D& Delta)
 void UInspectComponent::AddInspectZoom(float WheelDelta)
 {
 	if (!InspectingItem || !InspectionCamera || FMath::IsNearlyZero(WheelDelta)) { return; }
-	
+
 	CurrentFocalLength = FMath::Clamp(
 		CurrentFocalLength + WheelDelta * ZoomStep, MinFocalLength, MaxFocalLength);
 
