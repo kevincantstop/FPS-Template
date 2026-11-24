@@ -12,6 +12,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Health/HealthComponent.h"
 #include "Interaction/InteractComponent.h"
+#include "Interaction/Inspect/InspectComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -32,6 +33,8 @@ APlayerCharacter::APlayerCharacter()
 
 	RectLight = CreateDefaultSubobject<URectLightComponent>(TEXT("RectLight"));
 	RectLight->SetupAttachment(GetCapsuleComponent());
+
+	InspectComponent = CreateDefaultSubobject<UInspectComponent>(TEXT("InspectComponent"));
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 

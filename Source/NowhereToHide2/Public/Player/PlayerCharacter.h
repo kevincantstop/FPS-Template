@@ -13,6 +13,7 @@ class URectLightComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UCombatComponent;
+class UInspectComponent;
 
 UCLASS()
 class NOWHERETOHIDE2_API APlayerCharacter : public ACharacter
@@ -73,6 +74,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Interaction", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInteractComponent> InteractComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Inspect", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInspectComponent> InspectComponent;
+
 	virtual bool CanJumpInternal_Implementation() const override;
 
 public:	
@@ -119,6 +123,9 @@ public:
 
 	UFUNCTION()
 	void HandleDeath();
+
+	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Inspect")
+	UInspectComponent* GetInspectComponent() const { return InspectComponent; }
 	
 private:
 	UPROPERTY(VisibleAnywhere)
