@@ -38,6 +38,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Inspect")
 	float GetInspectDistance() const { return InspectDistance; }
 
+	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Inspect")
+	float GetInspectRadius() const;
+
 protected:
 	virtual void BeginPlay() override;
 

@@ -1,4 +1,4 @@
-﻿#include "Interaction/Inspect/InspectComponent.h"
+#include "Interaction/Inspect/InspectComponent.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -83,11 +83,11 @@ bool UInspectComponent::BeginInspect(AInspectItem* Item)
 
 	ACharacter* Character = Cast<ACharacter>(GetOwner());
 	APlayerController* PC = Character ? Cast<APlayerController>(Character->GetController()) : nullptr;
-	if (!Character || !PC) { return false; }
+	UWorld* World = GetWorld();
 
-	InspectingItem = Item;
+	if (!Character || !PC || !World) { return false; }
 	
-	FVector ViewLoc;
+	FVector  ViewLoc;
 	FRotator ViewRot;
 	PC->GetPlayerViewPoint(ViewLoc, ViewRot);
 
@@ -100,6 +100,36 @@ bool UInspectComponent::BeginInspect(AInspectItem* Item)
 	
 	CurrentFocalLength = FMath::Clamp(CurrentFocalLength, MinFocalLength, MaxFocalLength);
 	InspectionCamera->CurrentFocalLength = CurrentFocalLength;
+	
+	const float DesiredDistance =
+		Item->GetInspectDistance() > 0.f ? Item->GetInspectDistance() : ItemDistance;
+
+	float Distance = FMath::Max(DesiredDistance, MinDistance);
+	
+	{
+		const FVector CamLoc = InspectionCamera->GetComponentLocation();
+		const FVector CamFwd = InspectionCamera->GetForwardVector();
+		const FVector EndLoc = CamLoc + CamFwd * Distance;
+
+		FCollisionQueryParams Params(SCENE_QUERY_STAT(InspectOcclusion), false, Character);
+		Params.AddIgnoredActor(Character);
+		Params.AddIgnoredActor(Item);
+
+		FHitResult Hit;
+		const bool bBlocked = World->SweepSingleByChannel(
+			Hit, CamLoc, EndLoc, FQuat::Identity,
+			ECC_Visibility,
+			FCollisionShape::MakeSphere(FMath::Max(ItemClearance, 1.f)),
+			Params);
+
+		if (bBlocked)
+		{
+			Distance = FMath::Max(Hit.Distance - ItemClearance, MinDistance);
+		}
+	}
+	
+	InspectionSlot->SetRelativeLocation(FVector(Distance, 0.f, 0.f));
+	
 	FocusOnItem(Item);
 	
 	if (PlayerCamera)
@@ -118,13 +148,8 @@ bool UInspectComponent::BeginInspect(AInspectItem* Item)
 	{
 		Character->GetMesh()->bPauseAnims = true;
 	}
-
-	const float Distance = Item->GetInspectDistance() > 0.f
-		? Item->GetInspectDistance()
-		: ItemDistance;
-
-	InspectionSlot->SetRelativeLocation(FVector(Distance, 0.f, 0.f));
 	
+	InspectingItem = Item;
 	Item->BeginInspect(InspectionSlot->GetComponentTransform());
 	
 	if (TSubclassOf<UUserWidget> WidgetClass = Item->GetInspectWidgetClass())
@@ -139,6 +164,7 @@ bool UInspectComponent::BeginInspect(AInspectItem* Item)
 	FInputModeGameAndUI InputMode;
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	InputMode.SetHideCursorDuringCapture(false);
+
 	PC->SetInputMode(InputMode);
 	PC->bShowMouseCursor = true;
 

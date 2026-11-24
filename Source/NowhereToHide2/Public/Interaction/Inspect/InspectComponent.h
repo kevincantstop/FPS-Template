@@ -50,6 +50,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect", meta = (ClampMin = "0.01"))
 	float RotationSensitivity = 0.35f;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect", meta = (ClampMin = "12.0"))
+	float InspectFocalLength = 85.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect", meta = (ClampMin = "1.0"))
+	float FitPadding = 1.15f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect", meta = (ClampMin = "0.0"))
+	float ItemClearance = 12.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect", meta = (ClampMin = "1.0"))
+	float MinDistance = 22.f;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect")
 	bool bPausePlayerAnimations = true;
 

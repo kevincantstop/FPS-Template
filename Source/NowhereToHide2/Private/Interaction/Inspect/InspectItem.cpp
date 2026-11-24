@@ -7,7 +7,7 @@
 AInspectItem::AInspectItem()
 {
 	bOneShot = false;
-	PromptText = FText::FromString(TEXT("[E] Inspect"));
+	PromptText = FText::FromString(TEXT("Inspect"));
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
@@ -41,6 +41,12 @@ void AInspectItem::BeginPlay()
 
 	PivotBaseRotation    = InspectionPivot ? InspectionPivot->GetRelativeRotation() : FRotator::ZeroRotator;
 	CurrentPivotRotation = PivotBaseRotation;
+
+	if (ItemMesh)
+	{
+		ItemMesh->SetFirstPersonPrimitiveType(EFirstPersonPrimitiveType::FirstPerson);
+		ItemMesh->SetCastShadow(false);
+	}
 }
 
 void AInspectItem::Interact_Implementation(APawn* Interactor)
@@ -162,4 +168,13 @@ void AInspectItem::AddInspectRotation(const FVector2D& DeltaDegrees)
 		CurrentPivotRotation.Pitch + DeltaDegrees.Y, -MaxPitch, MaxPitch);
 
 	InspectionPivot->SetRelativeRotation(CurrentPivotRotation);
+}
+
+float AInspectItem::GetInspectRadius() const
+{
+	const UStaticMeshComponent* Visual = ItemMesh ? ItemMesh.Get() : Cast<UStaticMeshComponent>(Mesh);
+	if (!Visual) { return 20.f; }
+
+	const FVector Extent = Visual->Bounds.BoxExtent;
+	return FMath::Max3(Extent.X, Extent.Y, Extent.Z);
 }
