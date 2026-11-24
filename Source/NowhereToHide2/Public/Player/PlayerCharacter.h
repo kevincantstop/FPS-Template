@@ -29,6 +29,9 @@ public:
 
 	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
+	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Interaction")
+	UInteractComponent* GetInteractComponent() const { return InteractComponent; }
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -117,9 +120,6 @@ public:
 
 	UFUNCTION()
 	void HandleHealthChanged(float NewHealth, float DeltaHealth);
-
-	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Interaction")
-	UInteractComponent* GetInteractComponent() const { return InteractComponent; }
 
 	UFUNCTION()
 	void HandleDeath();

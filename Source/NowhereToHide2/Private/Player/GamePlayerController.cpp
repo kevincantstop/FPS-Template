@@ -11,6 +11,7 @@
 #include "Game/GamePlaySubsystem.h"
 #include "GameFramework/Character.h"
 #include "Interaction/InteractComponent.h"
+#include "Interaction/Inspect/InspectComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacter.h"
 #include "UI/HUDGameWidget.h"
@@ -109,6 +110,10 @@ void AGamePlayerController::SetupInputComponent()
 		EIC->BindAction(InteractAction, ETriggerEvent::Started, this, &AGamePlayerController::HandleInteract);
 		
 		EIC->BindAction(PauseAction, ETriggerEvent::Started, this, &AGamePlayerController::HandlePause);
+
+		EIC->BindAction(InspectRotateAction, ETriggerEvent::Triggered, this, &AGamePlayerController::HandleInspectRotate);
+		EIC->BindAction(InspectZoomAction,   ETriggerEvent::Triggered, this, &AGamePlayerController::HandleInspectZoom);
+		EIC->BindAction(InspectExitAction,   ETriggerEvent::Started,   this, &AGamePlayerController::HandleInspectExit);
 	}
 }
 
@@ -119,9 +124,16 @@ void AGamePlayerController::AcknowledgePossession(APawn* P)
 	CreateHUD();
 }
 
+bool AGamePlayerController::IsInspecting() const
+{
+	const APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn());
+	return C && C->GetInspectComponent() && C->GetInspectComponent()->IsInspecting();
+}
+
 void AGamePlayerController::HandleLook(const FInputActionValue& Value)
 {
 	if (!IsGameInputAllowed()) { return; }
+	if (IsInspecting()) { return; }
 	
 	const FVector2D Axis = Value.Get<FVector2D>();
 	AddYawInput(Axis.X);
@@ -136,6 +148,7 @@ void AGamePlayerController::HandleLook(const FInputActionValue& Value)
 void AGamePlayerController::HandleMove(const FInputActionValue& Value)
 {
 	if (!IsGameInputAllowed()) { return; }
+	if (IsInspecting()) { return; }
 	
 	APawn* P = GetPawn();
 	if (!P) { return; }
@@ -210,6 +223,7 @@ void AGamePlayerController::HandleAimStop()
 void AGamePlayerController::HandleFireStart()
 {
 	if (!IsGameInputAllowed()) { return; }
+	if (IsInspecting()) { return; }
 	
 	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
 	{
@@ -228,6 +242,7 @@ void AGamePlayerController::HandleFireStop()
 void AGamePlayerController::HandleReload()
 {
 	if (!IsGameInputAllowed()) { return; }
+	if (IsInspecting()) { return; }
 	
 	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
 	{
@@ -238,6 +253,7 @@ void AGamePlayerController::HandleReload()
 void AGamePlayerController::HandleInteract()
 {
 	if (!IsGameInputAllowed()) { return; }
+	if (IsInspecting()) { return; }
 	
 	if (const APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
 	{
@@ -323,5 +339,32 @@ void AGamePlayerController::ShowPauseMenu(bool bShow)
 	else if (PauseMenuWidget)
 	{
 		PauseMenuWidget->RemoveFromParent();
+	}
+}
+
+void AGamePlayerController::HandleInspectRotate(const FInputActionValue& Value)
+{
+	if (!IsInspecting()) { return; }
+	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
+	{
+		C->GetInspectComponent()->AddInspectRotation(Value.Get<FVector2D>());
+	}
+}
+
+void AGamePlayerController::HandleInspectZoom(const FInputActionValue& Value)
+{
+	if (!IsInspecting()) { return; }
+	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
+	{
+		C->GetInspectComponent()->AddInspectZoom(Value.Get<float>());
+	}
+}
+
+void AGamePlayerController::HandleInspectExit()
+{
+	if (!IsInspecting()) { return; }
+	if (APlayerCharacter* C = Cast<APlayerCharacter>(GetPawn()))
+	{
+		C->GetInspectComponent()->EndInspect();
 	}
 }

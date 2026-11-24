@@ -11,9 +11,6 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 
-/**
- * 
- */
 UCLASS()
 class NOWHERETOHIDE2_API AGamePlayerController : public APlayerController
 {
@@ -64,6 +61,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
 	TObjectPtr<UInputAction> PauseAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
+	TObjectPtr<UInputAction> InspectRotateAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
+	TObjectPtr<UInputAction> InspectZoomAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Input")
+	TObjectPtr<UInputAction> InspectExitAction;
+
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|UI")
 	TSubclassOf<UUserWidget> PauseMenuClass;
 	
@@ -106,6 +112,11 @@ private:
 
 	bool IsGameInputAllowed() const;
 	void SwapInputMappingContext(bool bPaused);
+
+	bool IsInspecting() const;
+	void HandleInspectRotate(const FInputActionValue& Value);
+	void HandleInspectZoom(const FInputActionValue& Value);
+	void HandleInspectExit();
 
 	UPROPERTY(Transient)
 	TObjectPtr<UUserWidget> PauseMenuWidget;
