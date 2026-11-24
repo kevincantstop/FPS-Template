@@ -42,6 +42,8 @@ void UInspectComponent::CreateRuntimeCamera()
 	InspectionCamera->AttachToComponent(
 		Owner->GetRootComponent(),
 		FAttachmentTransformRules::KeepRelativeTransform);
+
+	InspectionCamera->SetConstraintAspectRatio(false);
 	
 	InspectionCamera->SetActive(false);
 	
@@ -116,6 +118,12 @@ bool UInspectComponent::BeginInspect(AInspectItem* Item)
 	{
 		Character->GetMesh()->bPauseAnims = true;
 	}
+
+	const float Distance = Item->GetInspectDistance() > 0.f
+		? Item->GetInspectDistance()
+		: ItemDistance;
+
+	InspectionSlot->SetRelativeLocation(FVector(Distance, 0.f, 0.f));
 	
 	Item->BeginInspect(InspectionSlot->GetComponentTransform());
 	
