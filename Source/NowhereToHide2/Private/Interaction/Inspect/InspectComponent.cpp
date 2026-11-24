@@ -4,10 +4,13 @@
 #include "Camera/CameraComponent.h"
 #include "Camera/CameraTypes.h"
 #include "CineCameraComponent.h"
+#include "Combat/CombatComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Interaction/Inspect/InspectItem.h"
+#include "Player/PlayerCharacter.h"
+#include "Weapon/Weapon.h"
 
 UInspectComponent::UInspectComponent()
 {
@@ -254,6 +257,7 @@ bool UInspectComponent::BeginInspect(AInspectItem* Item)
 	
 	SwitchToInspectionCamera(true);
 	SetPlayerFrozen(true);
+	SetPlayerVisualsHidden(true);
 	
 	Item->BeginInspect(InspectionSlot->GetComponentTransform());
 	
@@ -295,6 +299,7 @@ void UInspectComponent::FinishEndInspect()
 	SwitchToInspectionCamera(false);
 	SetPlayerFrozen(false);
 	ApplyInspectionInputMode(false);
+	SetPlayerVisualsHidden(false);
 }
 
 void UInspectComponent::AddInspectRotation(const FVector2D& Delta)
@@ -312,4 +317,29 @@ void UInspectComponent::AddInspectZoom(float WheelDelta)
 		CurrentFocalLength + WheelDelta * ZoomStep, MinFocalLength, MaxFocalLength);
 
 	InspectionCamera->CurrentFocalLength = CurrentFocalLength;
+}
+
+void UInspectComponent::SetPlayerVisualsHidden(bool bHidden)
+{
+	ACharacter* Character = GetOwnerCharacter();
+	if (!Character) { return; }
+	
+	if (USkeletalMeshComponent* Body = Character->GetMesh())
+	{
+		Body->SetOwnerNoSee(bHidden);
+	}
+	
+	if (const APlayerCharacter* Player = Cast<APlayerCharacter>(Character))
+	{
+		if (UCombatComponent* Combat = Player->GetCombatComponent())
+		{
+			if (AWeapon* Weapon = Combat->GetCurrentWeapon())
+			{
+				if (USkeletalMeshComponent* WeaponMesh = Weapon->GetWeaponMesh())
+				{
+					WeaponMesh->SetOwnerNoSee(bHidden);
+				}
+			}
+		}
+	}
 }

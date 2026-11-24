@@ -80,6 +80,7 @@ private:
 	void  SwitchToInspectionCamera(bool bInspect);
 
 	void SetPlayerFrozen(bool bFrozen);
+	void SetPlayerVisualsHidden(bool bHidden);
 	void ApplyInspectionInputMode(bool bInspect);
 
 	void CreateInspectionWidget(AInspectItem* Item);
