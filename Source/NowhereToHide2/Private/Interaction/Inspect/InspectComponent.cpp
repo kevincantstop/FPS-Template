@@ -10,6 +10,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Interaction/Inspect/InspectItem.h"
 #include "Player/PlayerCharacter.h"
+#include "UI/Inspect/InspectWidgetBase.h"
 #include "Weapon/Weapon.h"
 
 UInspectComponent::UInspectComponent()
@@ -228,6 +229,11 @@ void UInspectComponent::CreateInspectionWidget(AInspectItem* Item)
 	InspectWidget = CreateWidget<UUserWidget>(PC, WidgetClass);
 	if (InspectWidget)
 	{
+		if (UInspectWidgetBase* Base = Cast<UInspectWidgetBase>(InspectWidget))
+		{
+			Base->SetInspectItem(Item);
+		}
+		
 		InspectWidget->AddToViewport(15);
 	}
 }

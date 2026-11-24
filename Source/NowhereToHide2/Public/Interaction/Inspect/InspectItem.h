@@ -52,6 +52,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Inspect")
 	TObjectPtr<UStaticMeshComponent> ItemMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Inspect")
+	FText InspectTitle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "NowhereToHide|Inspect", meta = (MultiLine = "true"))
+	FText InspectBody;
 	
 	UPROPERTY(EditAnywhere, Category = "NowhereToHide|Inspect", meta = (ClampMin = "0.01"))
 	FVector DesiredInspectScale = FVector(2.f);
