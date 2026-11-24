@@ -4,8 +4,10 @@
 #include "Components/ActorComponent.h"
 #include "InspectComponent.generated.h"
 
-class ACameraActor;
 class AInspectItem;
+class UCameraComponent;
+class UCineCameraComponent;
+class USceneComponent;
 class UUserWidget;
 
 UCLASS(ClassGroup=(NowhereToHide), meta=(BlueprintSpawnableComponent))
@@ -24,44 +26,52 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "NowhereToHide|Inspect")
 	bool IsInspecting() const { return InspectingItem != nullptr; }
-
+	
 	void AddInspectRotation(const FVector2D& Delta);
-
+	
 	void AddInspectZoom(float WheelDelta);
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect", meta = (ClampMin = "0.0"))
-	float CameraForwardOffset = 10.f;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect", meta = (ClampMin = "10.0"))
-	float ItemDistance = 65.f;
+	float ItemDistance = 44.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect", meta = (ClampMin = "5.0"))
+	float MinFocalLength = 35.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect")
-	float MinFOV = 20.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect")
-	float MaxFOV = 55.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect")
-	float ZoomStep = 3.f;
-
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect", meta = (ClampMin = "5.0"))
+	float MaxFocalLength = 85.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect", meta = (ClampMin = "0.1"))
+	float ZoomStep = 5.f;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect", meta = (ClampMin = "0.01"))
 	float RotationSensitivity = 0.35f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect", meta = (ClampMin = "0.0"))
-	float BlendTime = 0.2f;
+	UPROPERTY(EditDefaultsOnly, Category = "NowhereToHide|Inspect")
+	bool bPausePlayerAnimations = true;
 
 private:
+	void CreateRuntimeCamera();
+	void DestroyRuntimeCamera();
+	void FocusOnItem(AInspectItem* Item);
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UCameraComponent> PlayerCamera;
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UCineCameraComponent> InspectionCamera;
+	
+	UPROPERTY(Transient)
+	TObjectPtr<USceneComponent> InspectionSlot;
+
 	UPROPERTY(Transient)
 	TObjectPtr<AInspectItem> InspectingItem;
 
 	UPROPERTY(Transient)
-	TObjectPtr<ACameraActor> InspectionCamera;
-
-	UPROPERTY(Transient)
 	TObjectPtr<UUserWidget> InspectWidget;
 
-	float CurrentFOV = 55.f;
+	float CurrentFocalLength = 35.f;
 };

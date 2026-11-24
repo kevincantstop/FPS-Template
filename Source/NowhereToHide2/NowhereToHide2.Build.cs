@@ -11,7 +11,7 @@ public class NowhereToHide2 : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
 			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule",
-			"UMG"
+			"UMG", "CinematicCamera"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
