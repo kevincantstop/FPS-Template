@@ -22,7 +22,7 @@ AInspectItem::AInspectItem()
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
 	ItemMesh->SetupAttachment(InspectionRoot);
 	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	ItemMesh->SetCastShadow(false);
+	ItemMesh->SetCastShadow(true);
 }
 
 void AInspectItem::BeginPlay()
@@ -44,8 +44,7 @@ void AInspectItem::BeginPlay()
 
 	if (ItemMesh)
 	{
-		ItemMesh->SetFirstPersonPrimitiveType(EFirstPersonPrimitiveType::FirstPerson);
-		ItemMesh->SetCastShadow(false);
+		ItemMesh->SetCastShadow(true);
 	}
 }
 
@@ -77,6 +76,11 @@ void AInspectItem::BeginInspect(const FTransform& TargetTransform)
 	}
 	
 	SetActorEnableCollision(false);
+
+	if (ItemMesh)
+	{
+		ItemMesh->SetCastShadow(false);
+	}
 	
 	if (InspectionRoot)
 	{
@@ -144,6 +148,17 @@ void AInspectItem::Tick(float DeltaSeconds)
 		const FVector To   = bReturning ? FVector::OneVector : DesiredInspectScale;
 
 		InspectionRoot->SetRelativeScale3D(FMath::Lerp(From, To, Eased));
+	}
+
+	if (bReturning)
+	{
+		bInspecting = false;
+		SetActorEnableCollision(true);
+		
+		if (ItemMesh)
+		{
+			ItemMesh->SetCastShadow(true);
+		}
 	}
 
 	if (Alpha >= 1.f)
